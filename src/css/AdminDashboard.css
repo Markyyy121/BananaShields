@@ -34,6 +34,28 @@
   color: #102a12 !important;
 }
 
+/* Admin profile block matches nav link styling and gets subtle hover/focus */
+.admin-profile-link {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 10px;
+  transition: transform .08s ease, box-shadow .12s ease, background-color .08s ease;
+}
+.admin-profile-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.admin-profile-link:focus {
+  outline: 3px solid #3B82F6;
+  border-radius: 10px;
+}
+.sidenav-link:focus {
+  outline: 3px solid #3B82F6;
+  border-radius: 10px;
+}
+
 
 /* MAIN CONTENT */
 .admin-main {

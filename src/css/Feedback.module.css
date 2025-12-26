@@ -1,0 +1,31 @@
+.feedback-container {
+  padding: 16px;
+}
+
+.card-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .admin-main-container {
+    padding: 12px !important;
+  }
+  .card-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 14px;
+  }
+}
+
+.reply-textarea {
+  min-height: 150px;
+  resize: vertical;
+}

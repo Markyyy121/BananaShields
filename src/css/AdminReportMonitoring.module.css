@@ -1,0 +1,86 @@
+:root {
+  --arm-side-small: 12px;
+  --arm-side-medium: 24px;
+  --arm-side-large: 40px;
+}
+
+/* container tweaks specific to report monitoring */
+.arm-container {
+  padding-left: var(--arm-side-small);
+  padding-right: var(--arm-side-small);
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .arm-container { padding-left: var(--arm-side-medium); padding-right: var(--arm-side-medium); }
+}
+@media (min-width: 1024px) {
+  .arm-container { padding-left: var(--arm-side-large); padding-right: var(--arm-side-large); }
+}
+
+/* header responsiveness */
+.arm-header {
+  gap: 12px;
+}
+@media (max-width: 767.98px) {
+  .arm-header { flex-direction: column; align-items: flex-start; }
+  .arm-header .dropdown-toggle { width: 100%; }
+}
+
+/* metric cards */
+.metric-card {
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.metric-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#ffd54b,#ffb300);
+  color: #102a12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+@media (max-width: 767.98px) {
+  .metric-card { width: 100%; }
+}
+
+/* table responsiveness */
+.um-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.um-table { min-width: 980px; border-collapse: separate; }
+
+@media (max-width: 1024px) {
+  /* Make header stack/flow and allow dropdown to wrap */
+  .arm-header { flex-direction: row; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .arm-header .dropdown-toggle { min-width: 150px; }
+  /* Make metric cards two-up */
+  .metric-card { width: 48%; box-sizing: border-box; }
+  .metric-icon { width: 48px; height: 48px; }
+  .metric-value { font-size: 26px; }
+  .um-table { min-width: 760px; }
+}
+@media (max-width: 1023.98px) {
+  .um-table { min-width: 760px; }
+}
+@media (max-width: 767.98px) {
+  .um-table { min-width: 520px; }
+  .um-table th { font-size: 12px; }
+  .um-table td { font-size: 13px; }
+}
+
+/* row hover */
+.um-table tbody tr:hover { background: #f6f9f6; }
+
+/* compact table cells */
+.um-table td { vertical-align: middle; }
+
+/* small tweaks to search */
+.arm-search { width: 100%; }
+.arm-search .form-control { border-radius: 10px; }

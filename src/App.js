@@ -7,13 +7,17 @@ import AdminDashboard from "./pages/AdminDashboard";
 import UserManagement from "./pages/UserManagement";
 import AdminUserDetails from "./pages/AdminUserDetails";
 import AdminReportDetails from "./pages/AdminReportDetails";
+import Feedback from "./pages/Feedback";
+
+import AdminReportMonitoring from "./pages/AdminReportMonitoring";
+import AdminProfile from "./pages/AdminProfile";
 
 
 function App() {
   const [showDashboard, setShowDashboard] = useState(false);
 
   const handleLogin = () => {
-    setShowDashboard(true); // just flip the view
+    setShowDashboard(true);
   };
 
   return (
@@ -25,6 +29,7 @@ function App() {
             <Route path="/users" element={<UserManagement />} />
             <Route path="/users/:userId" element={<AdminUserDetails />} />
             <Route path="/reports/:reportId" element={<AdminReportDetails />} />
+          <Route path="/feedback" element={<Feedback />} />            <Route path="/profile" element={<AdminProfile />} />            <Route path="/reports" element={<AdminReportMonitoring />} />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

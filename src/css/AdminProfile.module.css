@@ -1,0 +1,172 @@
+/* Polished Admin Profile styles — accessible, responsive and a bit fancier */
+.ap-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(15,75,54,0.06);
+  border: 1px solid #E5E7EB;
+  transition: transform .12s ease, box-shadow .12s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+.ap-card:hover { transform: translateY(-6px); }
+
+/* Make the body a column so the form can center and the action row can be pinned */
+.ap-card .card-body { flex: 1 1 auto; display: flex; flex-direction: column; }
+
+/* Center the form content vertically and constrain width */
+.ap-form { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; }
+.ap-form-inner { width: 100%; max-width: 720px; margin: 0 auto; }
+
+/* Pin the action row to the bottom of the form */
+.ap-action-row { margin-top: auto; }
+
+.ap-section-title {
+  font-weight: 800;
+  color: #2D5F5F;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.ap-avatar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  min-height: 220px;
+}
+
+.ap-avatar-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: inline-block;
+}
+
+.ap-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgba(13,75,43,0.12);
+  border: 4px solid rgba(255,255,255,0.6);
+}
+
+.ap-avatar-initials {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #4A7C59;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(13,75,43,0.12);
+}
+
+.ap-avatar-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ap-helper {
+  color: #6C757D;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.btn-primary-gold {
+  background: #F4C430;
+  border: none;
+  color: #212529;
+  padding: 10px 18px;
+  border-radius: 8px;
+  transition: transform .06s ease, filter .06s ease;
+}
+.btn-primary-gold:hover { transform: translateY(-2px); filter: brightness(0.95); }
+.btn-primary-gold:active { transform: translateY(1px); }
+
+.btn-secondary-light {
+  background: #E8E8E8;
+  border: 1px solid #D1D5DB;
+  color: #212529;
+  transition: filter .06s ease;
+}
+.btn-secondary-light:hover { filter: brightness(0.97); }
+
+.disabled-field {
+  background: #F0F0F0 !important;
+  cursor: not-allowed;
+}
+
+.form-control:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.07) !important;
+}
+
+.ap-action-row .btn-secondary-light { min-width: 120px; }
+.ap-action-row .btn-primary-gold { min-width: 140px; }
+
+/* Responsive */
+@media (max-width: 767.98px) {
+  .ap-card { padding: 16px; }
+  .ap-avatar-container { width: 80px; height: 80px; }
+  .ap-avatar-initials { font-size: 28px; }
+  .ap-avatar-actions { flex-direction: column; align-items: stretch; }
+  .ap-action-row { flex-direction: column-reverse; gap: 8px; }
+  .ap-action-row .btn-primary-gold, .ap-action-row .btn-secondary-light { width: 100%; }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .ap-card { padding: 24px; }
+  .ap-avatar-container { width: 100px; height: 100px; }
+  .ap-avatar-initials { font-size: 36px; }
+  .ap-avatar-actions { flex-direction: row; gap: 12px; }
+  .ap-action-row { justify-content: flex-end; }
+}
+
+@media (min-width: 1024px) {
+  .ap-card { padding: 32px; }
+  .ap-avatar-container { width: 120px; height: 120px; }
+  .ap-avatar-actions { flex-direction: row; gap: 12px; }
+  .admin-main-container { max-width: 1200px; }
+
+/* Avatar overlay (camera) */
+.ap-avatar-container { position: relative; display: inline-block; }
+.ap-avatar-overlay {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform .08s ease, opacity .12s ease;
+  opacity: 0;
+}
+.ap-avatar-container:hover .ap-avatar-overlay,
+.ap-avatar-overlay:focus {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Toast container */
+.ap-toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
+}
+
+}
+

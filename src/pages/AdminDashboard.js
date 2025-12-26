@@ -25,20 +25,9 @@ const monthlyRegistrations = [
 ];
 
 const AdminDashboard = () => {
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  const openLogoutModal = () => setShowLogoutModal(true);
-  const closeLogoutModal = () => setShowLogoutModal(false);
-  const confirmLogout = () => {
-    // TODO: replace with real logout flow
-    console.log("Logout confirmed");
-    closeLogoutModal();
-    // Example: window.location.href = '/login';
-  };
-
   return (
     <div className="admin-page">
-      <SideNav onLogout={openLogoutModal} />
+      <SideNav />
 
       <div className="admin-main">
         <div className="admin-main-container">
@@ -88,29 +77,7 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Logout confirmation modal (renders in main content) */}
-                  <Modal
-                    show={showLogoutModal}
-                    onHide={closeLogoutModal}
-                    centered
-                    aria-labelledby="logout-modal-title"
-                    aria-describedby="logout-modal-desc"
-                    dialogClassName="logout-modal"
-                    backdropClassName="logout-backdrop"
-                  >
-                    <Modal.Body className="text-center">
-                      <div className="logout-icon" aria-hidden="true">
-                        <BoxArrowRight size={28} />
-                      </div>
-                      <div id="logout-modal-title" className="logout-title">Logout</div>
-                      <div id="logout-modal-desc" className="logout-message">Are you sure you want to logout?</div>
 
-                      <div className="logout-actions" role="group" aria-label="Logout actions">
-                        <Button variant="light" className="btn-logout-secondary" onClick={closeLogoutModal}>Cancel</Button>
-                        <Button className="btn-logout-primary" onClick={confirmLogout}>Logout</Button>
-                      </div>
-                    </Modal.Body>
-                  </Modal>
                 </Card>
               </Col>
             </Row>
