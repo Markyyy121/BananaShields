@@ -2,19 +2,19 @@
 import React, { useState, useMemo } from "react";
 import SideNav from "../components/sidenav";
 import {
-  Container,
   Row,
   Col,
   Card,
   Form,
   InputGroup,
   Table,
-  Badge,
   Button,
 } from "react-bootstrap";
 import { Search, Eye } from "react-bootstrap-icons";
 import "../css/UserManagement.css";
 import "../css/AdminDashboard.css";
+import { useNavigate } from "react-router-dom";
+
 
 const MOCK_TOTAL = 1247; // used only for pagination summary display
 
@@ -29,22 +29,11 @@ const sampleUsers = [
   { id: "USR-001254", name: "Liza Torres", initials: "LT", email: "liza@farm.ph", role: "Farmer", joined: "Aug 11, 2024", color: "gold" },
 ];
 
-const roleBadgeVariant = (role) => {
-  switch (role) {
-    case "Farmer":
-      return "farmer"; // yellow/gold
-    case "Expert":
-      return "expert"; // light blue
-    case "Admin":
-      return "admin"; // light purple
-    default:
-      return "secondary";
-  }
-};
 
 const UserManagement = () => {
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const navigate = useNavigate();
+
 
   const filtered = useMemo(() => {
     if (!query) return sampleUsers;
@@ -57,11 +46,9 @@ const UserManagement = () => {
     );
   }, [query]);
 
-  const handleView = (user) => {
-    // Replace with navigation to user detail or modal
-    console.log("View user", user.id);
-    alert(`Viewing user: ${user.name} (${user.id})`);
-  };
+const handleView = (user) => {
+  navigate(`/users/${user.id}`);
+};
 
   return (
     <div className="admin-page">
@@ -107,12 +94,12 @@ const UserManagement = () => {
               <Card className="um-table-card">
                 <div className="table-responsive um-table-wrap">
                   <Table hover borderless className="um-table" aria-label="User table">
-                    <thead className="um-table-head">
+                    <thead className="um-table-head text-center">
                       <tr>
                         <th>USER</th>
                         <th>EMAIL</th>
                         <th>JOINED</th>
-                        <th className="text-end">ACTIONS</th>
+                        <th>ACTIONS</th>
                       </tr>
                     </thead> 
                     <tbody>
@@ -134,7 +121,7 @@ const UserManagement = () => {
 
                           <td>{u.joined}</td>
 
-                          <td className="text-end">
+                          <td className="text-center">
                             <Button variant="light" className="btn-action" aria-label={`View ${u.name}`} onClick={() => handleView(u)}>
                               <Eye />
                             </Button>

@@ -5,6 +5,9 @@ import "./App.css";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserManagement from "./pages/UserManagement";
+import AdminUserDetails from "./pages/AdminUserDetails";
+import AdminReportDetails from "./pages/AdminReportDetails";
+
 
 function App() {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -20,7 +23,8 @@ function App() {
           <Routes>
             <Route path="/dashboard" element={<AdminDashboard />} />
             <Route path="/users" element={<UserManagement />} />
-  
+            <Route path="/users/:userId" element={<AdminUserDetails />} />
+            <Route path="/reports/:reportId" element={<AdminReportDetails />} />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
