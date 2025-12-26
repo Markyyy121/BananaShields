@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+
+/* Main content when sidebar is fixed */
+.main-with-sidenav {
+  flex: 1;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f1fbf1,#e6f6e6);
+  padding: 24px 32px;
+}
+
+@media (min-width: 768px) {
+  .main-with-sidenav {
+    margin-left: 240px; /* matches the fixed sidebar width */
+  }
+}
+
+/* Main content when sidebar is fixed */
+.main-with-sidenav {
+  flex: 1;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f1fbf1,#e6f6e6);
+  padding: 24px 32px;
+}
+
+@media (min-width: 768px) {
+  .main-with-sidenav {
+    margin-left: 240px; /* matches the fixed sidebar width */
+  }
+}

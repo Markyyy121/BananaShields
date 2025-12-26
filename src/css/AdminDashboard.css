@@ -1,0 +1,338 @@
+:root {
+  --sidenav-width-lg: 260px;
+  --brand-green: #0d4b2b;
+  --accent-yellow: #ffc107;
+}
+
+/* PAGE ROOT */
+.admin-page {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eaf7ea, #d7f2d6);
+  overflow-x: hidden;
+}
+
+/* SideNav link styles */
+.sidenav-link {
+  background-color: transparent !important;
+  color: #fff !important;
+  border-radius: 999px;
+  padding: 10px 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  border: none !important;
+}
+
+.sidenav-link:hover {
+  background-color: rgba(255,255,255,0.03) !important;
+}
+
+.sidenav-link.active {
+  background-color: var(--accent-yellow) !important;
+  color: #102a12 !important;
+}
+
+
+/* MAIN CONTENT */
+.admin-main {
+  flex: 1;
+  min-height: 100vh;
+  margin-left: 20px;
+  transition: margin-left 200ms ease, padding 200ms ease;
+} 
+
+/* Define a sensible sidebar width at tablet and desktop sizes */
+@media (min-width: 768px) {
+  :root {
+    --sidenav-width: 220px;
+  }
+  /* keep main content just to the right of the sidebar + divider */
+  .admin-main {
+    margin-left: calc(var(--sidenav-width) + 10px);
+    padding-left: 60px; /* more breathing room on wider screens */
+  }
+}
+
+/* LARGE SCREENS */
+@media (min-width: 1200px) {
+  :root {
+    --sidenav-width: var(--sidenav-width-lg);
+  }
+}
+
+/* REMOVE BOOTSTRAP SIDE PADDING */
+.admin-main .container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* CONTENT CONTAINER - make content occupy the available area (not centered) */
+.admin-main-container {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* On larger screens keep a small left gap but do not push content far right */
+@media (min-width: 768px) {
+  .admin-main {
+    margin-left: 10px; /* consistent small gap from the sidebar */
+  }
+  .admin-main-container {
+    margin-left: 0;
+    margin-right: 16px;
+    padding-left: 10px; /* small inner gutter */
+    padding-right: 16px;
+    max-width: none;
+  }
+}
+
+/* Keep mobile layouts centered-ish but with comfortable gutters */
+@media (max-width: 767.98px) {
+  .admin-main-container {
+    margin: 0 auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* TITLE */
+.admin-title {
+  margin-bottom: 18px;
+  color: var(--brand-green);
+  font-weight: 700;
+  font-size: 22px;
+  width: 100%;
+}
+
+/* Title badge with vertical centering */
+.admin-title-badge {
+  display: flex;                /* enable flexbox */
+  align-items: center;          /* vertical centering */
+  justify-content: flex-start;  /* keep text left-aligned */
+  
+  width: 100%;
+  height: 5rem;
+
+  background: #fff;
+  color: var(--brand-green);
+  padding: 0 20px;              /* remove vertical padding, keep horizontal */
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(13,75,43,0.06);
+
+  font-weight: 800;
+  font-size: 20px;
+}
+
+
+@media (max-width: 575.98px) {
+  .admin-title-badge {
+    padding: 10px 14px;
+    font-size: 18px;
+  }
+}
+
+/* METRIC CARD */
+.metric-card {
+  border-radius: 16px;
+  padding: 18px 20px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* keep content left-aligned */
+  text-align: left;
+  width: 100%; /* full width on small screens */
+  min-height: 120px; /* a bit taller */
+}
+
+@media (min-width: 768px) {
+  .metric-card {
+    width: 280px; /* narrower card on larger screens */
+    min-height: 140px; /* slightly taller */
+    padding: 20px 18px;
+  }
+}
+
+.metric-card small {
+  display: block;
+  text-align: left;
+  color: #697b6b;
+  font-weight: 600;
+} 
+
+.metric-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  font-size: 22px;
+}
+
+.metric-value {
+  margin: 0;
+  font-weight: 800;
+  font-size: 32px;
+  color: var(--brand-green);
+}
+
+/* ANALYTICS CARD */
+.analytics-card {
+  border-radius: 16px;
+  padding: 20px 24px;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  background: #fff;
+}
+
+/* CHART GRID */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* single-column layout since only one chart now */
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.chart-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.04);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* left align inner content */
+} 
+
+.panel-title {
+  font-weight: 700;
+  color: #2f6c48;
+  margin-bottom: 8px;
+}
+
+.chart-wrapper {
+  flex: 1;
+  min-height: 180px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start; /* ensure charts anchor to left */
+}
+
+/* RESPONSIVE */
+@media (max-width: 1439.98px) {
+  /* Below 1440px reduce left paddings and ensure elements fit the viewport */
+  .admin-main {
+    margin-left: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .admin-main-container { box-sizing: border-box; padding-right: 12px; }
+  .admin-title-badge { padding-right: 16px; box-sizing: border-box; max-width: 100%; overflow: visible; }
+  .chart-wrapper, .chart-panel { min-width: 0; }
+}
+
+@media (max-width: 991.98px) {
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chart-panel:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-main {
+    margin-left: 0;
+    padding: 20px 16px;
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Logout modal styles */
+.logout-backdrop.show {
+  background-color: rgba(0,0,0,0.4) !important; /* semi-transparent backdrop */
+}
+
+.logout-modal .modal-content {
+  border-radius: 12px;
+  padding: 24px;
+  border: none;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.logout-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent-yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #102a12;
+  margin: 0 auto 12px;
+}
+
+.logout-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 6px;
+}
+
+.logout-message {
+  color: #6c6c6c;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.logout-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-logout-primary {
+  background: #ffd700;
+  color: #102a12;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+}
+
+.btn-logout-primary:hover,
+.btn-logout-primary:focus {
+  filter: brightness(0.96);
+}
+
+.btn-logout-secondary {
+  background: #f7f7f7;
+  color: #222;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+.btn-logout-secondary:hover,
+.btn-logout-secondary:focus {
+  background: #efefef;
+}
+
+/* Accessibility focus ring */
+.btn-logout-primary:focus, .btn-logout-secondary:focus {
+  outline: 3px solid rgba(13,75,43,0.12);
+  outline-offset: 2px;
+}
