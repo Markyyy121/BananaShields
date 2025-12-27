@@ -49,58 +49,78 @@ const AdminUserDetails = () => {
         </Card>
 
         {/* Content aligned with title */}
-        <div className="admin-content flex-grow-1 p-4">
+        <div className="admin-content p-4">
           {/* User Profile */}
-          <Card className="border-0 mb-4">
-            <Card.Body>
-              <Row className="align-items-center">
-                <Col xs={12} md="auto" className="text-center mb-3 mb-md-0">
-                  <div
-                    style={{
-                      width: "120px", height: "120px", borderRadius: "50%",
-                      backgroundColor: "#4CAF50", color: "#FFFFFF",
-                      fontSize: "48px", fontWeight: 600,
-                      display: "flex", justifyContent: "center", alignItems: "center",
-                      letterSpacing: "1px"
-                    }}
-                  >
-                    JD
-                  </div>
-                </Col>
-                <Col className="d-flex flex-column justify-content-between">
-                  <div className="d-flex justify-content-between align-items-start flex-wrap">
-                    <div className="text-start">
-                      <h2 style={{ fontSize: "28px", fontWeight: 700, color: "#1A202C", lineHeight: 1.2, marginBottom: "6px" }}>
-                        Juan Dela Cruz
-                      </h2>
-                      <small style={{ fontSize: "13px", color: "#718096" }}>ID: 001_farmer</small>
-                    </div>
-                  </div>
-
-                  <Row className="mt-4 g-4 text-start">
-                    {[
-                      { icon: <FaEnvelope />, label: "Email Address", value: "juan.delacruz@email.com", bg: "#FEF3C7", iconColor: "#92400E" },
-                      { icon: <FaCalendarAlt />, label: "Joined Date", value: "Jan 15, 2024", bg: "#FED7AA", iconColor: "#C2410C" },
-                      { icon: <FaUser />, label: "Role", value: "Farmer", bg: "#FFEDD5", iconColor: "#B45309" },
-                      { icon: <FaCheckCircle />, label: "Account Status", value: "Active", bg: "#FEF9C3", iconColor: "#065F46" }
-                    ].map((item, index) => (
-                      <Col xs={12} md={6} key={index}>
-                        <div className="d-flex align-items-center justify-content-start text-start">
-                          <div style={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: item.bg, display: "flex", justifyContent: "center", alignItems: "center", color: item.iconColor, fontSize: "20px" }}>
-                            {item.icon}
-                          </div>
-                          <div className="ms-3">
-                            <div style={{ fontSize: "12px", color: "#6B7280", fontWeight: 500, marginBottom: "4px" }}>{item.label}</div>
-                            <div style={{ fontSize: "14px", color: "#374151", fontWeight: 600 }}>{item.value}</div>
-                          </div>
+            <Row className="mb-4">
+              <Col xs={12} lg={6}>
+                <Card className="border-0">
+                  <Card.Body>
+                    <Row className="align-items-center">
+                      <Col xs={12} md="auto" className="text-center mb-3 mb-md-0">
+                        <div
+                          style={{
+                            width: "120px",
+                            height: "120px",
+                            borderRadius: "50%",
+                            backgroundColor: "#4CAF50",
+                            color: "#FFFFFF",
+                            fontSize: "48px",
+                            fontWeight: 600,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            letterSpacing: "1px"
+                          }}
+                        >
+                          JD
                         </div>
                       </Col>
-                    ))}
-                  </Row>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
+
+                      <Col>
+                        <div className="text-start">
+                          <h2 style={{ fontSize: "26px", fontWeight: 700, marginBottom: "4px" }}>
+                            Juan Dela Cruz
+                          </h2>
+                          <small style={{ color: "#718096" }}>ID: 001_farmer</small>
+                        </div>
+
+                        <Row className="mt-4 g-3 text-start">
+                          {[
+                            { icon: <FaEnvelope />, label: "Email", value: "juan.delacruz@email.com", bg: "#FEF3C7", iconColor: "#92400E" },
+                            { icon: <FaCalendarAlt />, label: "Joined", value: "Jan 15, 2024", bg: "#FED7AA", iconColor: "#C2410C" },
+                            { icon: <FaUser />, label: "Role", value: "Farmer", bg: "#FFEDD5", iconColor: "#B45309" },
+                            { icon: <FaCheckCircle />, label: "Status", value: "Active", bg: "#FEF9C3", iconColor: "#065F46" }
+                          ].map((item, index) => (
+                            <Col xs={12} md={6} key={index}>
+                              <div className="d-flex align-items-center">
+                                <div
+                                  style={{
+                                    width: "38px",
+                                    height: "38px",
+                                    borderRadius: "50%",
+                                    backgroundColor: item.bg,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: item.iconColor
+                                  }}
+                                >
+                                  {item.icon}
+                                </div>
+                                <div className="ms-3">
+                                  <div style={{ fontSize: "12px", color: "#6B7280" }}>{item.label}</div>
+                                  <div style={{ fontSize: "14px", fontWeight: 600 }}>{item.value}</div>
+                                </div>
+                              </div>
+                            </Col>
+                          ))}
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
 
           {/* Scanned Reports */}
           <Card className="shadow-sm border-0 rounded p-3 p-md-4">

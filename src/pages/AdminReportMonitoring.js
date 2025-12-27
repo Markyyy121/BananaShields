@@ -93,7 +93,7 @@ const AdminReportMonitoring = () => {
 
           {/* Search */}
           <Row className="mb-3">
-            <Col xs={4}>
+            <Col xs={12} md={6} lg={4}>
               <InputGroup>
                 <InputGroup.Text style={{ background: '#fff' }}>🔍</InputGroup.Text>
                 <Form.Control placeholder="Search by disease, user, location..." value={query} onChange={(e) => setQuery(e.target.value)} />
@@ -104,7 +104,7 @@ const AdminReportMonitoring = () => {
           {/* Data table */}
           <Card className="um-table-card">
             <div className="table-responsive um-table-wrap">
-              <Table hover className="um-table" style={{ minWidth: 980 }}>
+              <Table hover className="um-table">
                 <thead className="um-table-head">
                   <tr>
                     {['REPORT ID', 'SUBMITTED BY', 'DISEASE DETECTED', 'CONFIDENCE', 'SEVERITY', 'SCAN DATE', 'STATUS', 'ACTIONS'].map((h) => (

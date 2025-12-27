@@ -52,23 +52,29 @@
   .metric-card { width: 100%; }
 }
 
+@media (min-width: 768px) {
+  /* match AdminDashboard behavior: fixed-ish metric card widths on tablets and up */
+  .metric-card { width: 280px; box-sizing: border-box; }
+}
+
 /* table responsiveness */
 .um-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.um-table { min-width: 980px; border-collapse: separate; }
+.um-table { min-width: 640px; width: 100%; border-collapse: separate; }
 
 @media (max-width: 1024px) {
   /* Make header stack/flow and allow dropdown to wrap */
   .arm-header { flex-direction: row; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
-  .arm-header .dropdown-toggle { min-width: 150px; }
-  /* Make metric cards two-up */
-  .metric-card { width: 48%; box-sizing: border-box; }
+  .arm-header .dropdown-toggle { min-width: 120px; }
+
+  /* Stack metric cards to match AdminDashboard behavior on small desktops/tablets */
+  .metric-card { width: 100%; box-sizing: border-box; }
   .metric-icon { width: 48px; height: 48px; }
   .metric-value { font-size: 26px; }
-  .um-table { min-width: 760px; }
+
+  /* Reduce table min-width so tables are more fluid on <=1024px */
+  .um-table { min-width: 640px; }
 }
-@media (max-width: 1023.98px) {
-  .um-table { min-width: 760px; }
-}
+
 @media (max-width: 767.98px) {
   .um-table { min-width: 520px; }
   .um-table th { font-size: 12px; }

@@ -112,41 +112,14 @@ const AdminProfile = () => {
           <h3 className="admin-title"><span className="admin-title-badge">Edit Profile</span></h3>
 
           <Row className="mb-3">
-            <Col xs={12} lg={4} className="mb-3">
-              <Card className="ap-card">
-                <Card.Body>
-                  <h5 className="ap-section-title">Profile Picture</h5>
-                  <div className="ap-avatar-wrap">
-                    <div className="ap-avatar-container">
-                      {avatarPreview ? (
-                        <Image src={avatarPreview} roundedCircle className="ap-avatar" alt="Profile avatar preview" />
-                      ) : (
-                        <div className="ap-avatar ap-avatar-initials" aria-hidden>AD</div>
-                      )}
 
-                      <button type="button" className="ap-avatar-overlay" aria-label="Change profile photo" onClick={onUploadClick}>
-                        <FiCamera size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="ap-avatar-actions">
-                    <input ref={fileRef} type="file" accept="image/png,image/jpeg" onChange={onFileChange} style={{ display: "none" }} />
-                    <Button className="btn-primary-gold mb-2" onClick={onUploadClick}>Upload Photo</Button>
-                    <Button variant="light" className="btn-secondary-light" onClick={onRemove}>Remove</Button>
-                    <div className="ap-helper">Upload a new avatar for your profile. Recommended size: 400×400px</div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col xs={12} lg={8}>
+            <Col xs={12} lg={12}>
               <Card className="ap-card">
                 <Card.Body>
                   <h5 className="ap-section-title">Personal Information</h5>
 
                   <Form>
-                    <Row className="g-3">
+                    <Row className="g-3 text-start">
                       <Col xs={12} md={6}>
                         <Form.Group controlId="firstName">
                           <Form.Label>First Name</Form.Label>
@@ -225,18 +198,6 @@ const AdminProfile = () => {
               </div>
             </Modal.Body>
           </Modal>
-
-          {/* Toast */}
-          <div className="ap-toast-container" aria-live="polite" aria-atomic="true">
-            <Toast show={showToast} onClose={() => setShowToast(false)} autohide delay={2500}>
-              <Toast.Header>
-                <strong className="me-auto">Profile</strong>
-                <small>just now</small>
-              </Toast.Header>
-              <Toast.Body>Changes saved successfully.</Toast.Body>
-            </Toast>
-          </div>
-
         </div>
       </div>
     </div>

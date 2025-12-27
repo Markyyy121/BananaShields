@@ -10,6 +10,8 @@
   flex-direction: column;
   min-height: 420px;
 }
+
+
 .ap-card:hover { transform: translateY(-6px); }
 
 /* Make the body a column so the form can center and the action row can be pinned */
@@ -23,9 +25,9 @@
 .ap-action-row { margin-top: auto; }
 
 .ap-section-title {
-  font-weight: 800;
+  font-weight: bold;
   color: #2D5F5F;
-  font-size: 20px;
+  font-size: 30px;
   margin-bottom: 16px;
 }
 
