@@ -1,5 +1,4 @@
-// src/pages/UserManagement.js
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import SideNav from "../components/sidenav";
 import {
   Row,
@@ -9,46 +8,84 @@ import {
   InputGroup,
   Table,
   Button,
+  Spinner,
 } from "react-bootstrap";
 import { Search, Eye } from "react-bootstrap-icons";
 import "../css/UserManagement.css";
 import "../css/AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
 
+// Firebase
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { db } from "../firebase/firebase";
 
-const MOCK_TOTAL = 1247; // used only for pagination summary display
-
-const sampleUsers = [
-  { id: "USR-001247", name: "Juan Dela Cruz", initials: "JD", email: "juan@farm.ph", role: "Farmer", joined: "Jan 15, 2024", color: "green" },
-  { id: "USR-001248", name: "Maria Santos", initials: "MS", email: "maria@farm.ph", role: "Farmer", joined: "Feb 02, 2024", color: "gold" },
-  { id: "USR-001249", name: "Rico Cruz", initials: "RC", email: "rico@farm.ph", role: "Expert", joined: "Mar 22, 2024", color: "blue" },
-  { id: "USR-001250", name: "Ana Lopez", initials: "AL", email: "ana@farm.ph", role: "Farmer", joined: "Apr 10, 2024", color: "green" },
-  { id: "USR-001251", name: "Paolo Mendoza", initials: "PM", email: "paolo@farm.ph", role: "Admin", joined: "May 05, 2024", color: "purple" },
-  { id: "USR-001252", name: "Trisha Reyes", initials: "TR", email: "trisha@farm.ph", role: "Expert", joined: "Jun 12, 2024", color: "blue" },
-  { id: "USR-001253", name: "Miguel Garcia", initials: "MG", email: "miguel@farm.ph", role: "Farmer", joined: "Jul 21, 2024", color: "green" },
-  { id: "USR-001254", name: "Liza Torres", initials: "LT", email: "liza@farm.ph", role: "Farmer", joined: "Aug 11, 2024", color: "gold" },
-];
-
+const USERS_PER_PAGE = 7;
 
 const UserManagement = () => {
-  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState([]);
+  const [queryText, setQueryText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
+  // Fetch users from Firestore
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
 
-  const filtered = useMemo(() => {
-    if (!query) return sampleUsers;
-    const q = query.toLowerCase();
-    return sampleUsers.filter(
+        const usersData = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
+
+          let joinedDate = "N/A";
+          if (data.createdAt && typeof data.createdAt === "number") {
+            joinedDate = new Date(data.createdAt).toLocaleDateString();
+          }
+
+          return {
+            id: doc.id,
+            fullName,
+            email: data.email || "",
+            createdAt: joinedDate,
+          };
+        });
+
+        setUsers(usersData);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Filter users by search query
+  const filteredUsers = useMemo(() => {
+    if (!queryText) return users;
+    const q = queryText.toLowerCase();
+    return users.filter(
       (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.id.toLowerCase().includes(q)
+        u.fullName.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [users, queryText]);
 
-const handleView = (user) => {
-  navigate(`/users/${user.id}`);
-};
+  // Pagination logic
+  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * USERS_PER_PAGE;
+    return filteredUsers.slice(startIndex, startIndex + USERS_PER_PAGE);
+  }, [filteredUsers, currentPage]);
+
+  const handleView = (user) => {
+    navigate(`/users/${user.id}`);
+  };
 
   return (
     <div className="admin-page">
@@ -56,7 +93,9 @@ const handleView = (user) => {
 
       <div className="admin-main">
         <div className="admin-main-container">
-          <h3 className="admin-title"><span className="admin-title-badge">User Management</span></h3>
+          <h3 className="admin-title">
+            <span className="admin-title-badge">User Management</span>
+          </h3>
 
           <Row className="mb-1">
             <Col xs={12} md={6} lg={4} className="mb-3">
@@ -64,8 +103,8 @@ const handleView = (user) => {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", width: "100%" }}>
                   <div className="metric-icon">👨‍🌾</div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", height: "100%" }}>
-                    <h4 className="metric-value">25</h4>
-                    <small>Active Farmers</small>
+                    <h4 className="metric-value">{loading ? <Spinner animation="border" size="sm" /> :filteredUsers.length}</h4>
+                    <small>Total Users</small>
                   </div>
                 </div>
               </Card>
@@ -79,70 +118,101 @@ const handleView = (user) => {
                   <Search />
                 </InputGroup.Text>
                 <Form.Control
-                  placeholder="Search users by name or by email...."
+                  placeholder="Search users by name or email..."
                   aria-label="Search users"
                   aria-describedby="search-addon"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  value={queryText}
+                  onChange={(e) => {
+                    setQueryText(e.target.value);
+                    setCurrentPage(1); // Reset to first page on search
+                  }}
                 />
               </InputGroup>
             </Col>
-          </Row> 
+          </Row>
 
           <Row>
             <Col xs={12}>
               <Card className="um-table-card">
                 <div className="table-responsive um-table-wrap">
-                  <Table hover borderless className="um-table" aria-label="User table">
-                    <thead className="um-table-head text-center">
-                      <tr>
-                        <th>USER</th>
-                        <th>EMAIL</th>
-                        <th>JOINED</th>
-                        <th>ACTIONS</th>
-                      </tr>
-                    </thead> 
-                    <tbody>
-                      {filtered.map((u) => (
-                        <tr key={u.id}>
-                          <td>
-                            <div className="user-cell">
-                              <div className={`avatar ${u.color}`} aria-hidden="true">{u.initials}</div>
-                              <div className="user-meta">
-                                <div className="user-name">{u.name}</div>
-                                <div className="user-id">ID: {u.id}</div>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td>
-                            <div className="text-muted">{u.email}</div>
-                          </td>
-
-                          <td>{u.joined}</td>
-
-                          <td className="text-center">
-                            <Button variant="light" className="btn-action" aria-label={`View ${u.name}`} onClick={() => handleView(u)}>
-                              <Eye />
-                            </Button>
-                          </td>
+                  {loading ? (
+                    <div className="text-center p-4">
+                      <Spinner animation="border" variant="success" />
+                    </div>
+                  ) : (
+                    <Table hover borderless className="um-table" aria-label="User table">
+                      <thead className="um-table-head text-center">
+                        <tr>
+                          <th>FULL NAME</th>
+                          <th>EMAIL</th>
+                          <th>JOINED</th>
+                          <th>ACTIONS</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                      </thead>
+                        <tbody>
+                          {paginatedUsers.length > 0 ? (
+                            paginatedUsers.map((user) => (
+                              <tr key={user.id}>
+                                <td>{user.fullName}</td>
+                                <td>{user.email}</td>
+                                <td>{user.createdAt}</td>
+                                <td className="text-center">
+                                  <Button
+                                    variant="light"
+                                    className="btn-action"
+                                    onClick={() => handleView(user)}
+                                  >
+                                    <Eye />
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="4" className="text-center text-muted">
+                                No users found.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                    </Table>
+                  )}
                 </div>
 
-                <div className="um-table-footer">
-                  <div className="results-text">Showing 1-8 of {MOCK_TOTAL.toLocaleString()} users</div>
+                <div className="um-table-footer d-flex justify-content-between align-items-center">
+                  <div className="results-text">
+                    Showing {paginatedUsers.length} of {filteredUsers.length} users
+                  </div>
+
                   <div className="pagination-controls">
-                    <Button variant="light" className="page-btn">&lt;</Button>
-                    <Button variant="light" className="page-btn active">1</Button>
-                    <Button variant="light" className="page-btn">2</Button>
-                    <Button variant="light" className="page-btn">3</Button>
-                    <Button variant="light" className="page-btn">&gt;</Button>
+                    <Button
+                      variant="light"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => p - 1)}
+                    >
+                      &lt;
+                    </Button>
+
+                    {[...Array(totalPages)].map((_, idx) => (
+                      <Button
+                        key={idx}
+                        variant={currentPage === idx + 1 ? "primary" : "light"}
+                        onClick={() => setCurrentPage(idx + 1)}
+                        className="mx-1"
+                      >
+                        {idx + 1}
+                      </Button>
+                    ))}
+
+                    <Button
+                      variant="light"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                    >
+                      &gt;
+                    </Button>
                   </div>
                 </div>
-
               </Card>
             </Col>
           </Row>

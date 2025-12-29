@@ -1,14 +1,70 @@
 // AdminLogin.js
-import React from "react";
+import React, { useState } from "react";
 import logo from "../assets/images/bananashieldslogo.png";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Form, Button, Modal } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+// Firebase
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/firebase";
+
 const Login = ({ onLogin }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();          // prevent page reload
-    if (onLogin) onLogin();      // trigger UI navigation
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [modalShow, setModalShow] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+
+  const handleCloseModal = () => setModalShow(false);
+
+  const showModal = (title, message) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalShow(true);
+  }
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!email || !password) {
+    showModal("Error", "Please enter both email and password.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email.trim(),
+      password
+    );
+
+    const uid = userCredential.user.uid;
+
+    const adminRef = doc(db, "admin", uid);
+    const adminSnap = await getDoc(adminRef);
+
+    if (!adminSnap.exists()) {
+      showModal("Access Denied", "You are not an admin.");
+      return
+    }
+
+    showModal("Success", "Login successful!");
+
+    if (onLogin) onLogin();
+
+  } catch (error) {
+    console.error("Login error:", error);
+    showModal("Error", error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div
@@ -32,14 +88,7 @@ const Login = ({ onLogin }) => {
                 border: "none",
               }}
             >
-              {/* Logo */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginBottom: "16px",
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
                 <img
                   src={logo}
                   alt="BananaShield logo"
@@ -47,7 +96,6 @@ const Login = ({ onLogin }) => {
                 />
               </div>
 
-              {/* Title + subtitle */}
               <div style={{ textAlign: "center", marginBottom: "32px" }}>
                 <h2
                   style={{
@@ -64,53 +112,24 @@ const Login = ({ onLogin }) => {
                 </p>
               </div>
 
-              {/* Form */}
               <Form className="text-start" onSubmit={handleSubmit}>
                 <Form.Group controlId="formEmail" className="mb-3">
-                  <Form.Label
-                    style={{
-                      display: "block",
-                      textAlign: "left",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#4b5b52",
-                    }}
-                  >
-                    Email Address
-                  </Form.Label>
+                  <Form.Label>Email Address</Form.Label>
                   <Form.Control
                     type="email"
                     placeholder="Enter your email address"
-                    style={{
-                      borderRadius: "12px",
-                      borderColor: "#d0ddcf",
-                      padding: "10px 12px",
-                      fontSize: "14px",
-                    }}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Form.Group>
 
                 <Form.Group controlId="formPassword" className="mb-4">
-                  <Form.Label
-                    style={{
-                      display: "block",
-                      textAlign: "left",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#4b5b52",
-                    }}
-                  >
-                    Password
-                  </Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
                     placeholder="Enter your password"
-                    style={{
-                      borderRadius: "12px",
-                      borderColor: "#d0ddcf",
-                      padding: "10px 12px",
-                      fontSize: "14px",
-                    }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </Form.Group>
 
@@ -118,25 +137,30 @@ const Login = ({ onLogin }) => {
                   type="submit"
                   variant="success"
                   className="w-100"
-                  style={{
-                    borderRadius: "999px",
-                    padding: "10px 0",
-                    fontWeight: 600,
-                    backgroundColor: "#0d4b2b",
-                    borderColor: "#0d4b2b",
-                  }}
+                  disabled={loading}
                 >
-                  Sign In
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </Form>
 
-              {/* Footer text */}
               <div className="text-center small text-muted mt-4">
                 © 2025 BananaShield. All rights reserved.
               </div>
             </Card>
           </Col>
         </Row>
+
+        <Modal show={modalShow} onHide={handleCloseModal} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>{modalTitle}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{modalMessage}</Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" onClick={handleCloseModal}>
+              OK
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Container>
     </div>
   );
