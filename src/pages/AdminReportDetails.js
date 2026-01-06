@@ -1,212 +1,257 @@
-import React from "react";
-import { Card, Row, Col, Badge, Button } from "react-bootstrap";
-import { FaArrowLeft, FaMapMarkerAlt, FaCalendarAlt, FaPercent, FaLeaf, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { Card, Row, Col, Badge, Spinner } from "react-bootstrap";
+import {
+  FaArrowLeft,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaPercent,
+  FaLeaf,
+  FaExclamationTriangle
+} from "react-icons/fa";
 import { GiBanana } from "react-icons/gi";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import SideNav from "../components/sidenav";
-import "../css/AdminDashboard.css";
+
+// Firebase
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/firebase";
+
+const getInitials = (name) => {
+  if (!name) return "NA";
+  const words = name.trim().split(" ");
+  if (words.length === 1) return words[0][0].toUpperCase();
+  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+};
 
 const AdminReportDetails = () => {
   const navigate = useNavigate();
   const { reportId } = useParams();
   const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const fromUserId = query.get("userId");
+  const from = location.state?.from;
+  const userId = location.state?.userId;
 
-  const report = {
-    id: reportId || "R1",
-    disease: "Panama Disease (Fusarium Wilt)",
-    confidence: 94.5,
-    crop: "Saba Banana",
-    location: "Davao City, Philippines",
-    scanDate: "Oct 20, 2024",
-    scanTime: "09:45 AM",
-    symptoms: ["Yellowing of leaves", "Wilting of lower leaves", "Vascular discoloration"],
-    submittedBy: { name: "Juan Dela Cruz", email: "juan.delacruz@email.com", id: "#001", role: "Farmer", joined: "Jan 15, 2024" },
-  };
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const ref = doc(db, "scan_history", reportId);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const data = snap.data();
+          const createdAt = data.createdAt?.toDate();
+
+          setReport({
+            id: snap.id,
+            disease: data.diseaseName || "N/A",
+            crop: data.diseaseType || "N/A",
+            confidence: data.confidenceLevel ?? 0,
+            location: data.location || "N/A",
+            scanDate: createdAt ? createdAt.toLocaleDateString() : "N/A",
+            scanTime: createdAt ? createdAt.toLocaleTimeString() : "N/A",
+            imageUrl: data.imageUrl || "",
+            symptoms: data.symptoms || [],
+            treatmentSteps: (data.treatmentSteps || []).map(step => step.description),
+            submittedBy: {
+              name: data.userName || "Unknown",
+              email: data.userEmail || "N/A",
+              id: data.userId || "N/A",
+              joined: "N/A",
+              profileImageUrl: data.userProfileImageUrl || null
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching report:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReport();
+  }, [reportId]);
 
   return (
-    <div className="d-flex admin-page" style={{ minHeight: "100vh" }}>
-      <SideNav />
+    <div className="admin-page">
+      {/* Sidebar */}
+      <aside className="admin-sidenav">
+        <SideNav />
+      </aside>
 
-      <div className="admin-main">
-        <div className="admin-main-container" style={{ backgroundColor: "#EDF7ED", padding: "0  24px 24px" }}>
+      {/* Main content */}
+      <main className="admin-main">
+        {loading ? (
+          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
+            <Spinner animation="border" variant="success" />
+          </div>
+        ) : (
+          <div className="admin-main-container">
 
-          {/* Header */}
-          <Card className="border-0 mb-4" style={{ backgroundColor: "#E8F5E9", borderRadius: 12 }}>
+            {/* Header */}
+            <Card className="border-0 mb-4" style={{ backgroundColor: "#E8F5E9", borderRadius: 12 }}>
               <Card.Body style={{ padding: 0 }}>
-              <h3 className="admin-title" style={{ marginTop: 0 }}><span className="admin-title-badge">Report Details</span></h3>
+                <h3 className="admin-title">
+                  <span className="admin-title-badge">Report Details</span>
+                </h3>
 
-              <div className="text-start">
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); if (fromUserId) { navigate(`/users/${fromUserId}`); } else { navigate(-1); } }}
-                  style={{ color: "#6B7280", fontSize: 14, textDecoration: "none", display: "inline-block", marginBottom: 8 }}
-                >
-                  <FaArrowLeft className="me-2" /> Back to Reports Monitoring
-                </a>
+                <div className="text-start">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (from === "reports") navigate("/reports");
+                      else if (from === "user" && userId) navigate(`/users/${userId}`);
+                      else navigate(-1);
+                    }}
+                    style={{ color: "#6B7280", fontSize: 14, textDecoration: "none" }}
+                  >
+                    <FaArrowLeft className="me-2" /> Back
+                  </a>
 
-                <div style={{ fontSize: 14, color: "#4B5563", fontWeight: 500 }}>Report ID: #{report.id}</div>
-              </div>
-            </Card.Body>
-          </Card>
-
-          {/* Main two-column layout */}
-          <Row className="g-4">
-            {/* Left column ~70% */}
-            <Col lg={8} md={12}>
-              {/* Disease Detection Summary */}
-              <Card style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", padding: 0 }} className="mb-4">
-                <Card.Body style={{ padding: 32 }}>
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <h3 style={{ fontSize: 20, fontWeight: 700, color: "#1F2937", margin: 0 }}>Disease Detection Summary</h3>
-                    <div>
-                      <Badge style={{ backgroundColor: "#D1FAE5", color: "#047857", fontSize: 12, fontWeight: 600, padding: "6px 12px", borderRadius: 12 }}>
-                        <FaCheckCircle className="me-1" /> ✓ Confirmed
-                      </Badge>
-                      <Badge style={{ backgroundColor: "#FEE2E2", color: "#DC2626", fontSize: 12, fontWeight: 600, padding: "6px 12px", borderRadius: 12, marginLeft: 8 }} className="ms-2">
-                        <FaExclamationTriangle className="me-1" /> ⚠ Critical Severity
-                      </Badge>
-                    </div>
+                  <div style={{ fontSize: 14, color: "#4B5563", fontWeight: 500 }}>
+                    Report ID: #{report.id}
                   </div>
+                </div>
+              </Card.Body>
+            </Card>
 
-                  {/* Info grid 2x3 */}
-                  <Row className="g-3">
-                    <Col md={6}>
-                      <div style={{ display: "flex", gap: 12, alignItems: "center", borderRadius: 8, padding: 16, background: "#FEE2E2" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#EF4444", fontSize: 20 }}>
+            <Row className="g-4">
+              {/* LEFT */}
+              <Col xs={12} lg={8}>
+                {/* Disease Detection Summary */}
+                <Card className="mb-4">
+                  <Card.Body style={{ padding: 32 }}>
+                    <h3 style={{ fontSize: 20, fontWeight: 700, color: "#1F2937", marginBottom: 16 }}>Disease Detection Summary</h3>
+
+                    <Row className="g-3 text-start">
+                      <Col xs={12} md={6}>
+                        <div className="d-flex gap-3 p-3 bg-danger-subtle rounded align-items-center">
                           <FaExclamationTriangle />
+                          <div>
+                            <div className="text-muted small">Disease Name</div>
+                            <div>🔴 {report.disease}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Disease Detected</div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>🔴 {report.disease}</div>
-                        </div>
-                      </div>
-                    </Col>
+                      </Col>
 
-                    <Col md={6}>
-                      <div style={{ display: "flex", gap: 12, alignItems: "center", borderRadius: 8, padding: 16, background: "#DBEAFE" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#3B82F6", fontSize: 18 }}>
+                      <Col xs={12} md={6}>
+                        <div className="d-flex gap-3 p-3 bg-primary-subtle rounded align-items-center">
                           <FaPercent />
+                          <div>
+                            <div className="text-muted small">Confidence Level</div>
+                            <div>{report.confidence}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Confidence Level</div>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: "#10B981" }}>{report.confidence}%</div>
-                        </div>
-                      </div>
-                    </Col>
+                      </Col>
 
-                    <Col md={6}>
-                      <div style={{ display: "flex", gap: 12, alignItems: "center", borderRadius: 8, padding: 16, background: "#ECFDF5" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#10B981", fontSize: 18 }}>
+                      <Col xs={12} md={6}>
+                        <div className="d-flex gap-3 p-3 bg-success-subtle rounded align-items-center">
                           <FaLeaf />
+                          <div>
+                            <div className="text-muted small">Disease Type</div>
+                            <div>{report.crop}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Crop Type</div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>{report.crop}</div>
-                        </div>
-                      </div>
-                    </Col>
+                      </Col>
 
-                    <Col md={6}>
-                      <div style={{ display: "flex", gap: 12, alignItems: "center", borderRadius: 8, padding: 16, background: "#FEE2E2" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#EF4444", fontSize: 18 }}>
+                      <Col xs={12} md={6}>
+                        <div className="d-flex gap-3 p-3 bg-danger-subtle rounded align-items-center">
                           <FaMapMarkerAlt />
+                          <div>
+                            <div className="text-muted small">Location</div>
+                            <div>{report.location}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Location</div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>{report.location}</div>
-                        </div>
-                      </div>
-                    </Col>
+                      </Col>
 
-                    <Col md={6}>
-                      <div style={{ display: "flex", gap: 12, alignItems: "center", borderRadius: 8, padding: 16, background: "#F3F4F6" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280", fontSize: 18 }}>
+                      <Col xs={12} md={6}>
+                        <div className="d-flex gap-3 p-3 bg-light rounded align-items-center">
                           <FaCalendarAlt />
+                          <div>
+                            <div className="text-muted small">Scan Date & Time</div>
+                            <div>{report.scanDate}</div>
+                            <small>{report.scanTime}</small>
+                          </div>
                         </div>
-                        <div>
-                          <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 4 }}>Scan Date & Time</div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>{report.scanDate}</div>
-                          <div style={{ fontSize: 12, color: "#9CA3AF" }}>{report.scanTime}</div>
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
+                      </Col>
+                    </Row>
 
-                  {/* Observed Symptoms */}
-                  <div style={{ marginTop: 32 }}>
-                    <h4 style={{ fontSize: 18, fontWeight: 700, color: "#1F2937", marginBottom: 12 }}>Observed Symptoms</h4>
-                    <ul style={{ paddingLeft: 18, margin: 0, lineHeight: 1.8 }}>
-                      {report.symptoms.map((s, i) => (
-                        <li key={i} style={{ color: "#374151", fontSize: 14, marginBottom: 6 }}> <span style={{ color: "#EF4444", marginRight: 8 }}>•</span>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </Card.Body>
-              </Card>
-
-              {/* Visual Inspection */}
-              <Card style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", padding: 0 }} className="mb-4">
-                <Card.Body style={{ padding: 32 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 700, color: "#1F2937", marginBottom: 16 }}>Visual Inspection</h3>
-                  <div style={{ background: "#F3F4F6", borderRadius: 12, height: 400, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 100, height: 100, borderRadius: 50, background: "#FDB71A", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <GiBanana style={{ color: "#000", fontSize: 40 }} />
+                    {/* Symptoms */}
+                    <div className="text-start mt-4">
+                      <h4>Observed Symptoms</h4>
+                      <ul>
+                        {report.symptoms.map((s, i) => <li key={i}>{s}</li>)}
+                      </ul>
                     </div>
-                  </div>
-                </Card.Body>
-              </Card>
+                  </Card.Body>
+                </Card>
 
-              {/* Treatment Recommendation */}
-              <Card style={{ background: "#CCFBF1", borderRadius: 12, padding: 0, borderLeft: "4px solid #10B981" }} className="mb-4">
-                <Card.Body style={{ padding: 24 }}>
-                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 40, background: "#10B981", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 18 }}>
-                      <FaCheckCircle />
+                {/* Visual Inspection */}
+                <Card className="mb-4">
+                  <Card.Body style={{ padding: 32 }}>
+                    <h3>Visual Inspection</h3>
+                    <div className="d-flex justify-content-center align-items-center" style={{ background: "#F3F4F6", borderRadius: 12, minHeight: 300 }}>
+                      {report.imageUrl ? (
+                        <img src={report.imageUrl} alt="Scan" style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 12 }} />
+                      ) : <GiBanana size={60} />}
                     </div>
-                    <div>
-                      <h4 style={{ fontSize: 18, fontWeight: 700, color: "#0F766E", marginBottom: 12 }}>Treatment Recommendation</h4>
-                      <div style={{ fontSize: 14, color: "#374151", lineHeight: 1.6 }}>Immediate isolation of affected plants. Remove and destroy infected plants. Apply soil fumigation in affected areas. Plant resistant varieties like GCTCV-218.</div>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
+                  </Card.Body>
+                </Card>
 
-            {/* Right column ~30% */}
-            <Col lg={4} md={12}>
-              <div style={{ position: "sticky", top: 24 }}>
-                <Card style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", padding: 0 }}>
+                {/* Treatment */}
+                <Card className="mb-4">
+                  <Card.Body style={{ padding: 24 }}>
+                    <h4>Treatment Recommendation</h4>
+                    {report.treatmentSteps.map((step, i) => <p key={i}>{step}</p>)}
+                  </Card.Body>
+                </Card>
+              </Col>
+
+              {/* RIGHT */}
+              <Col xs={12} lg={4}>
+                <Card style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
                   <Card.Body style={{ padding: 24, textAlign: "center" }}>
                     <h5 style={{ fontSize: 16, fontWeight: 700, color: "#1F2937", marginBottom: 20 }}>Submitted By</h5>
-                    <div style={{ width: 80, height: 80, borderRadius: 40, background: "#10B981", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700, margin: "0 auto 16px" }}>JD</div>
+
+                    {report.submittedBy.profileImageUrl ? (
+                      <img
+                        src={report.submittedBy.profileImageUrl}
+                        alt="Profile"
+                        style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", margin: "0 auto 16px" }}
+                      />
+                    ) : (
+                      <div style={{ width: 80, height: 80, borderRadius: 40, background: "#10B981", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700, margin: "0 auto 16px" }}>
+                        {getInitials(report.submittedBy.name)}
+                      </div>
+                    )}
+
                     <div style={{ fontSize: 16, fontWeight: 700, color: "#1F2937", marginBottom: 6 }}>{report.submittedBy.name}</div>
                     <div style={{ fontSize: 13, color: "#6B7280", marginBottom: 12 }}>{report.submittedBy.email}</div>
                     <Badge style={{ backgroundColor: "#FDE68A", color: "#92400E", fontSize: 12, fontWeight: 600, padding: "6px 16px", borderRadius: 16, marginBottom: 24 }}>Farmer</Badge>
 
-                    <div style={{ textAlign: "left", marginTop: 16 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F3F4F6" }}>
-                        <div style={{ color: "#6B7280", fontSize: 13 }}>User ID:</div>
-                        <div style={{ color: "#374151", fontSize: 13 }}>{report.submittedBy.id}</div>
+                    <div className="text-start">
+                      <div className="d-flex justify-content-between border-bottom py-1">
+                        <span style={{ color: "#6B7280", fontSize: 13 }}>User ID:</span>
+                        <span style={{ color: "#374151", fontSize: 13 }}>{report.submittedBy.id}</span>
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F3F4F6", alignItems: "center" }}>
-                        <div style={{ color: "#6B7280", fontSize: 13 }}>Status:</div>
-                        <div><Badge style={{ backgroundColor: "#D1FAE5", color: "#065F46", padding: "4px 8px", borderRadius: 8 }}>Active</Badge></div>
+                      <div className="d-flex justify-content-between border-bottom py-1 align-items-center">
+                        <span style={{ color: "#6B7280", fontSize: 13 }}>Status:</span>
+                        <Badge style={{ backgroundColor: "#D1FAE5", color: "#065F46", padding: "4px 8px", borderRadius: 8 }}>Active</Badge>
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F3F4F6" }}>
-                        <div style={{ color: "#6B7280", fontSize: 13 }}>Joined:</div>
-                        <div style={{ color: "#374151", fontSize: 13 }}>{report.submittedBy.joined}</div>
+                      <div className="d-flex justify-content-between border-bottom py-1">
+                        <span style={{ color: "#6B7280", fontSize: 13 }}>Joined:</span>
+                        <span style={{ color: "#374151", fontSize: 13 }}>{report.submittedBy.joined}</span>
                       </div>
                     </div>
                   </Card.Body>
                 </Card>
-              </div>
-            </Col>
-          </Row>
-
-        </div>
-      </div>
+              </Col>
+            </Row>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

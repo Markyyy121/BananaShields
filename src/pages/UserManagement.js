@@ -15,7 +15,6 @@ import "../css/UserManagement.css";
 import "../css/AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
 
-// Firebase
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
@@ -28,7 +27,7 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  // Fetch users from Firestore
+  // Fetch users from Firebase
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -42,14 +41,20 @@ const UserManagement = () => {
           const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
 
           let joinedDate = "N/A";
-          if (data.createdAt && typeof data.createdAt === "number") {
-            joinedDate = new Date(data.createdAt).toLocaleDateString();
+          if (data.createdAt) {
+            if (typeof data.createdAt.toDate === "function") {
+              joinedDate = data.createdAt.toDate().toLocaleDateString();
+            } else if (typeof data.createdAt === "number") {
+              joinedDate = new Date(data.createdAt).toLocaleDateString();
+            }
           }
 
           return {
             id: doc.id,
-            fullName,
-            email: data.email || "",
+            fullName: fullName || "N/A",
+            email: data.email || "N/A",
+            phone: data.phone || "N/A",
+            farmSize: data.farmSize || "N/A",
             createdAt: joinedDate,
           };
         });
@@ -65,45 +70,67 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Filter users by search query
+  // Filter users
   const filteredUsers = useMemo(() => {
     if (!queryText) return users;
     const q = queryText.toLowerCase();
     return users.filter(
       (u) =>
         u.fullName.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q)
+        u.email.toLowerCase().includes(q) ||
+        u.phone.toLowerCase().includes(q)
     );
   }, [users, queryText]);
 
-  // Pagination logic
+  // Pagination
   const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
   const paginatedUsers = useMemo(() => {
     const startIndex = (currentPage - 1) * USERS_PER_PAGE;
     return filteredUsers.slice(startIndex, startIndex + USERS_PER_PAGE);
   }, [filteredUsers, currentPage]);
 
-  const handleView = (user) => {
-    navigate(`/users/${user.id}`);
+  // Generate pagination buttons (max 3 visible + ellipsis)
+  const getPageButtons = () => {
+    const pages = [];
+    const maxVisible = 3;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 2) {
+        pages.push(1, 2, 3, "…", totalPages);
+      } else if (currentPage >= totalPages - 1) {
+        pages.push(1, "…", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "…", currentPage, "…", totalPages);
+      }
+    }
+
+    return pages;
   };
 
   return (
     <div className="admin-page">
-      <SideNav />
+      <aside className="admin-sidenav">
+        <SideNav />
+      </aside>
 
-      <div className="admin-main">
+      <main className="admin-main">
         <div className="admin-main-container">
           <h3 className="admin-title">
             <span className="admin-title-badge">User Management</span>
           </h3>
 
-          <Row className="mb-1">
-            <Col xs={12} md={6} lg={4} className="mb-3">
-              <Card className="um-stat-card metric-card">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", width: "100%" }}>
+          {/* Metric */}
+          <Row className="mb-3">
+            <Col xs={12} md={6} lg={4}>
+              <Card className="metric-card">
+                <div className="d-flex align-items-center">
                   <div className="metric-icon">👨‍🌾</div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", height: "100%" }}>
-                    <h4 className="metric-value">{loading ? <Spinner animation="border" size="sm" /> :filteredUsers.length}</h4>
+                  <div>
+                    <h4 className="metric-value mb-0">
+                      {loading ? <Spinner size="sm" /> : filteredUsers.length}
+                    </h4>
                     <small>Total Users</small>
                   </div>
                 </div>
@@ -111,56 +138,61 @@ const UserManagement = () => {
             </Col>
           </Row>
 
-          <Row className="mb-2">
+          {/* Search */}
+          <Row className="mb-3">
             <Col xs={12} md={6} lg={4}>
               <InputGroup className="um-search">
-                <InputGroup.Text id="search-addon" className="search-icon">
+                <InputGroup.Text className="search-icon">
                   <Search />
                 </InputGroup.Text>
                 <Form.Control
-                  placeholder="Search users by name or email..."
-                  aria-label="Search users"
-                  aria-describedby="search-addon"
+                  placeholder="Search users by name, email, or phone..."
                   value={queryText}
                   onChange={(e) => {
                     setQueryText(e.target.value);
-                    setCurrentPage(1); // Reset to first page on search
+                    setCurrentPage(1);
                   }}
                 />
               </InputGroup>
             </Col>
           </Row>
 
+          {/* Table */}
           <Row>
             <Col xs={12}>
               <Card className="um-table-card">
                 <div className="table-responsive um-table-wrap">
                   {loading ? (
                     <div className="text-center p-4">
-                      <Spinner animation="border" variant="success" />
+                      <Spinner animation="border" />
                     </div>
                   ) : (
-                    <Table hover borderless className="um-table" aria-label="User table">
-                      <thead className="um-table-head text-center">
-                        <tr>
-                          <th>FULL NAME</th>
-                          <th>EMAIL</th>
-                          <th>JOINED</th>
-                          <th>ACTIONS</th>
-                        </tr>
-                      </thead>
+                    <>
+                      <Table hover borderless className="um-table text-center">
+                        <thead className="um-table-head">
+                          <tr>
+                            <th>FULL NAME</th>
+                            <th>EMAIL</th>
+                            <th>PHONE</th>
+                            <th>FARM SIZE</th>
+                            <th>JOINED</th>
+                            <th>ACTIONS</th>
+                          </tr>
+                        </thead>
                         <tbody>
-                          {paginatedUsers.length > 0 ? (
+                          {paginatedUsers.length ? (
                             paginatedUsers.map((user) => (
                               <tr key={user.id}>
                                 <td>{user.fullName}</td>
                                 <td>{user.email}</td>
+                                <td>{user.phone}</td>
+                                <td>{user.farmSize}</td>
                                 <td>{user.createdAt}</td>
-                                <td className="text-center">
+                                <td>
                                   <Button
                                     variant="light"
                                     className="btn-action"
-                                    onClick={() => handleView(user)}
+                                    onClick={() => navigate(`/users/${user.id}`)}
                                   >
                                     <Eye />
                                   </Button>
@@ -169,55 +201,59 @@ const UserManagement = () => {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="4" className="text-center text-muted">
+                              <td colSpan={6} className="text-muted">
                                 No users found.
                               </td>
                             </tr>
                           )}
                         </tbody>
-                    </Table>
+                      </Table>
+
+                      {/* ✅ Right-aligned Pagination */}
+                      {totalPages > 1 && (
+                        <div className="d-flex justify-content-end align-items-center mt-3">
+                          <Button
+                            variant="light"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage((p) => p - 1)}
+                          >
+                            &lt;
+                          </Button>
+
+                          {getPageButtons().map((p, idx) =>
+                            p === "…" ? (
+                              <span key={idx} className="mx-1">
+                                …
+                              </span>
+                            ) : (
+                              <Button
+                                key={idx}
+                                variant={currentPage === p ? "primary" : "light"}
+                                onClick={() => setCurrentPage(p)}
+                                className="mx-1"
+                              >
+                                {p}
+                              </Button>
+                            )
+                          )}
+
+                          <Button
+                            variant="light"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage((p) => p + 1)}
+                          >
+                            &gt;
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )}
-                </div>
-
-                <div className="um-table-footer d-flex justify-content-between align-items-center">
-                  <div className="results-text">
-                    Showing {paginatedUsers.length} of {filteredUsers.length} users
-                  </div>
-
-                  <div className="pagination-controls">
-                    <Button
-                      variant="light"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage((p) => p - 1)}
-                    >
-                      &lt;
-                    </Button>
-
-                    {[...Array(totalPages)].map((_, idx) => (
-                      <Button
-                        key={idx}
-                        variant={currentPage === idx + 1 ? "primary" : "light"}
-                        onClick={() => setCurrentPage(idx + 1)}
-                        className="mx-1"
-                      >
-                        {idx + 1}
-                      </Button>
-                    ))}
-
-                    <Button
-                      variant="light"
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage((p) => p + 1)}
-                    >
-                      &gt;
-                    </Button>
-                  </div>
                 </div>
               </Card>
             </Col>
           </Row>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

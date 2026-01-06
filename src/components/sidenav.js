@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import { Nav, Offcanvas, Button, Modal } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import logo from "../assets/images/bananashieldslogo.png";
-import { List, House, People, BarChart, Bell, BoxArrowRight } from "react-bootstrap-icons";
+import {
+  List,
+  House,
+  People,
+  BarChart,
+  Bell,
+  BoxArrowRight,
+} from "react-bootstrap-icons";
 
-const navContent = (onLogout, openLogoutModal, onProfile) => (
+// Navigation content for both desktop and mobile
+const navContent = (openLogoutModal, closeMobile) => (
   <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
     {/* Branding */}
     <div style={{ marginBottom: 20 }}>
@@ -20,23 +28,33 @@ const navContent = (onLogout, openLogoutModal, onProfile) => (
             justifyContent: "center",
           }}
         >
-          <img
-            src={logo}
-            alt="BananaShield logo"
-            style={{ width: 28, height: 28 }}
-          />
+          <img src={logo} alt="BananaShield" style={{ width: 28 }} />
         </div>
 
         <div>
-          <h5 style={{ margin: 0, color: "#fff", fontWeight: 700 }}>BananaShield</h5>
+          <h5 style={{ margin: 0, color: "#fff", fontWeight: 700 }}>
+            BananaShield
+          </h5>
           <small style={{ color: "#bcd4c1" }}>Admin Panel</small>
         </div>
       </div>
     </div>
 
-    {/* Admin profile card */}
+    {/* Admin Profile Card */}
     <div style={{ marginBottom: 20 }}>
-      <NavLink to="/profile" className={({isActive}) => (isActive ? 'sidenav-link admin-profile-link active' : 'sidenav-link admin-profile-link')} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12 }}>
+      <NavLink
+        to="/profile"
+        className="admin-profile-link"
+        onClick={closeMobile} // close offcanvas on mobile
+        style={{
+          textDecoration: "none",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: 12,
+          borderRadius: 12,
+        }}
+      >
         <div
           style={{
             width: 44,
@@ -52,46 +70,42 @@ const navContent = (onLogout, openLogoutModal, onProfile) => (
         >
           AD
         </div>
+
         <div style={{ color: "#fff" }}>
           <div style={{ fontWeight: 700 }}>Admin User</div>
-          <div style={{ fontSize: 12, color: "#ffd54b", fontWeight: 700 }}>Administrator</div>
+          <div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>
+            Administrator
+          </div>
         </div>
       </NavLink>
     </div>
 
-    {/* Navigation menu */}
-    <Nav className="flex-column" variant="pills" style={{ gap: 8 }}>
-      <Nav.Item>
-        <Nav.Link as={NavLink} to="/dashboard" end className="sidenav-link">
-          <House size={18} /> Dashboard
+    {/* Navigation Links */}
+    <Nav className="flex-column text-start" style={{ gap: 8 }}>
+      {[
+        { to: "/dashboard", icon: <House size={18} />, label: "Dashboard" },
+        { to: "/users", icon: <People size={18} />, label: "User Management" },
+        { to: "/reports", icon: <BarChart size={18} />, label: "Reports Monitoring" },
+        { to: "/feedback", icon: <Bell size={18} />, label: "Feedback" },
+      ].map((item, i) => (
+        <Nav.Link
+          key={i}
+          as={NavLink}
+          to={item.to}
+          className="sidenav-link"
+          onClick={closeMobile} // hide offcanvas on mobile
+        >
+          {item.icon} {item.label}
         </Nav.Link>
-      </Nav.Item>
-
-      <Nav.Item>
-        <Nav.Link as={NavLink} to="/users" className="sidenav-link">
-          <People size={18} /> User Management
-        </Nav.Link>
-      </Nav.Item>
-
-      <Nav.Item>
-        <Nav.Link as={NavLink} to="/reports" className="sidenav-link">
-          <BarChart size={18} /> Reports Monitoring
-        </Nav.Link>
-      </Nav.Item>
-
-      <Nav.Item>
-        <Nav.Link as={NavLink} to="/feedback" className="sidenav-link">
-          <Bell size={18} /> Feedback
-        </Nav.Link>
-      </Nav.Item>
+      ))}
     </Nav>
 
-    {/* Logout anchored to bottom */}
+    {/* Logout Button */}
     <div style={{ marginTop: "auto" }}>
       <Button
         onClick={() => {
-          if (typeof onLogout === 'function') return onLogout();
-          openLogoutModal();
+          closeMobile(); // hide offcanvas first
+          openLogoutModal(); // then open logout modal
         }}
         style={{
           width: "100%",
@@ -112,124 +126,96 @@ const navContent = (onLogout, openLogoutModal, onProfile) => (
   </div>
 );
 
-const SideNav = ({ onLogout }) => {
-  const [show, setShow] = useState(false);
+const SideNav = () => {
+  const [showMobile, setShowMobile] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const openLogoutModal = () => setShowLogoutModal(true);
-  const closeLogoutModal = () => setShowLogoutModal(false);
-  const navigate = useNavigate();
-  const openProfile = () => navigate('/profile');
-
   const confirmLogout = () => {
-    // Clear common auth storage keys and redirect to login
-    try {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      sessionStorage.removeItem('authToken');
-      sessionStorage.removeItem('user');
-    } catch (err) {
-      console.warn('Failed to clear storage during logout', err);
-    }
-
-    closeLogoutModal();
-    // Force a full reload to the app root so App renders the login screen (showDashboard is in-memory)
-    try {
-      window.location.replace('/');
-    } catch (err) {
-      // Fallback to navigate if replace isn't available in the environment
-      navigate('/');
-    }
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.replace("/");
   };
 
   return (
     <>
-      {/* Mobile toggle button */}
-      <Button
-        variant="success"
-        className="d-md-none"
-        onClick={() => setShow(true)}
-        style={{
-          position: "fixed",
-          top: 16,
-          left: 16,
-          zIndex: 1050,
-          borderRadius: 8,
-          backgroundColor: "#0f4e36",
-          border: "none",
-          color: '#fff'
-        }}
-      >
-        <List size={22} />
-      </Button> 
+      {/* Mobile Toggle Button */}
+      {!showMobile && ( // hide the icon when Offcanvas is open
+        <Button
+          className="d-md-none"
+          onClick={() => setShowMobile(true)}
+          style={{
+            position: "fixed",
+            top: 16,
+            left: 16,
+            zIndex: 1050,
+            backgroundColor: "#0f4e36",
+            border: "none",
+            borderRadius: 8,
+          }}
+        >
+          <List size={22} />
+        </Button>
+      )}
 
-      {/* Desktop sidebar */}
+      {/* Desktop Sidebar */}
       <div
         className="d-none d-md-flex flex-column"
         style={{
-          width: "var(--sidenav-width)",
+          width: 240,
           background: "linear-gradient(180deg,#0f4e36,#114b33)",
           position: "fixed",
           left: 0,
           top: 0,
           bottom: 0,
-          color: "#ffffff",
+          color: "#fff",
           padding: "20px 16px",
-          zIndex: 1060, // ensure sidebar sits above main content
+          zIndex: 1060,
         }}
       >
-        {navContent(onLogout, openLogoutModal, openProfile)}
-      </div> 
+        {navContent(() => setShowLogoutModal(true), () => {})}
+      </div>
 
-      {/* thin divider between sidebar and main content (md+) */}
-      <div
-        className="d-none d-md-block"
-        style={{
-          position: "fixed",
-          left: "var(--sidenav-width)",
-          top: 0,
-          bottom: 0,
-          width: 10,
-          background: "linear-gradient(180deg,#0f4e36,#114b33)",
-          zIndex: 1055, // below the sidebar but above main content
-        }}
-      /> 
-
-      {/* Mobile offcanvas */}
+      {/* Mobile Offcanvas */}
       <Offcanvas
-        show={show}
-        onHide={() => setShow(false)}
-        responsive="md"
-        style={{ background: "linear-gradient(180deg,#0f4e36,#114b33)", color: "#fff" }}
+        show={showMobile}
+        onHide={() => setShowMobile(false)}
+        placement="start"
+        className="d-md-none"
+        style={{
+          background: "linear-gradient(180deg,#0f4e36,#114b33)",
+          color: "#fff",
+        }}
       >
         <Offcanvas.Header closeButton closeVariant="white">
           <Offcanvas.Title>BananaShield</Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body className="d-flex flex-column">
-          {navContent(onLogout, openLogoutModal, openProfile)}
+
+        <Offcanvas.Body>
+          {navContent(
+            () => setShowLogoutModal(true),
+            () => setShowMobile(false) // closeMobile function
+          )}
         </Offcanvas.Body>
       </Offcanvas>
 
-      {/* Logout confirmation modal (renders from SideNav so it's accessible on every page) */}
+      {/* Logout Modal */}
       <Modal
         show={showLogoutModal}
-        onHide={closeLogoutModal}
+        onHide={() => setShowLogoutModal(false)}
         centered
-        aria-labelledby="logout-modal-title"
-        aria-describedby="logout-modal-desc"
-        dialogClassName="logout-modal"
-        backdropClassName="logout-backdrop"
       >
         <Modal.Body className="text-center">
-          <div className="logout-icon" aria-hidden="true">
-            <BoxArrowRight size={28} />
-          </div>
-          <div id="logout-modal-title" className="logout-title">Logout</div>
-          <div id="logout-modal-desc" className="logout-message">Are you sure you want to logout?</div>
+          <BoxArrowRight size={28} className="mb-2" />
+          <h4>Confirm Logout</h4>
+          <p>Are you sure you want to log out of your account?</p>
 
-          <div className="logout-actions" role="group" aria-label="Logout actions" style={{ marginTop: 16 }}>
-            <Button variant="light" className="btn-logout-secondary" onClick={closeLogoutModal}>Cancel</Button>
-            <Button className="btn-logout-primary" onClick={confirmLogout} style={{ marginLeft: 8 }}>Logout</Button>
+          <div className="d-flex justify-content-center gap-3 mt-3">
+            <Button variant="light" onClick={() => setShowLogoutModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="warning" onClick={confirmLogout}>
+              Logout
+            </Button>
           </div>
         </Modal.Body>
       </Modal>

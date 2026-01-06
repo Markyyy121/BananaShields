@@ -1,7 +1,15 @@
 // AdminLogin.js
 import React, { useState } from "react";
 import logo from "../assets/images/bananashieldslogo.png";
-import { Container, Row, Col, Card, Form, Button, Modal } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Modal,
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Firebase
@@ -24,96 +32,73 @@ const Login = ({ onLogin }) => {
     setModalTitle(title);
     setModalMessage(message);
     setModalShow(true);
-  }
+  };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!email || !password) {
-    showModal("Error", "Please enter both email and password.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email.trim(),
-      password
-    );
-
-    const uid = userCredential.user.uid;
-
-    const adminRef = doc(db, "admin", uid);
-    const adminSnap = await getDoc(adminRef);
-
-    if (!adminSnap.exists()) {
-      showModal("Access Denied", "You are not an admin.");
-      return
+    if (!email || !password) {
+      showModal("Error", "Please enter both email and password.");
+      return;
     }
 
-    showModal("Success", "Login successful!");
+    try {
+      setLoading(true);
 
-    if (onLogin) onLogin();
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
 
-  } catch (error) {
-    console.error("Login error:", error);
-    showModal("Error", error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      const uid = userCredential.user.uid;
+      const adminRef = doc(db, "admin", uid);
+      const adminSnap = await getDoc(adminRef);
 
+      if (!adminSnap.exists()) {
+        showModal("Access Denied", "You are not an admin.");
+        return;
+      }
+
+      showModal("Success", "Login successful!");
+      if (onLogin) onLogin();
+    } catch (error) {
+      console.error("Login error:", error);
+      showModal("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#1f6b3b",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Container>
+    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-success">
+      <Container fluid className="px-3">
         <Row className="justify-content-center">
-          <Col xs={12} sm={10} md={8} lg={5} xl={4} className="mx-auto">
-            <Card
-              className="p-4 p-md-5"
-              style={{
-                borderRadius: "20px",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
-                backgroundColor: "#d7f2d6",
-                border: "none",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+          <Col xs={12} sm={10} md={8} lg={5} xl={4}>
+            <Card className="p-4 p-md-5 shadow border-0 rounded-4 bg-light">
+              {/* Logo */}
+              <div className="text-center mb-3">
                 <img
                   src={logo}
                   alt="BananaShield logo"
-                  style={{ width: "88px", height: "88px", objectFit: "contain" }}
+                  className="img-fluid"
+                  style={{ maxWidth: "88px" }}
                 />
               </div>
 
-              <div style={{ textAlign: "center", marginBottom: "32px" }}>
-                <h2
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "38px",
-                    marginBottom: "4px",
-                    color: "#165233",
-                  }}
-                >
+              {/* Title */}
+              <div className="text-center mb-4">
+                <h2 className="fw-bold fs-2 fs-md-1 text-success mb-1">
                   BananaShield
                 </h2>
-                <p style={{ margin: 0, color: "#6f7d75", fontSize: "14px" }}>
+                <p className="text-muted small mb-0">
                   Sign in to access the admin dashboard
                 </p>
               </div>
 
-              <Form className="text-start" onSubmit={handleSubmit}>
-                <Form.Group controlId="formEmail" className="mb-3">
+              {/* Form */}
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3 text-start">
                   <Form.Label>Email Address</Form.Label>
                   <Form.Control
                     type="email"
@@ -123,7 +108,7 @@ const Login = ({ onLogin }) => {
                   />
                 </Form.Group>
 
-                <Form.Group controlId="formPassword" className="mb-4">
+                <Form.Group className="mb-4 text-start">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
@@ -143,13 +128,15 @@ const Login = ({ onLogin }) => {
                 </Button>
               </Form>
 
-              <div className="text-center small text-muted mt-4">
+              {/* Footer */}
+              <div className="text-center text-muted small mt-4">
                 © 2025 BananaShield. All rights reserved.
               </div>
             </Card>
           </Col>
         </Row>
 
+        {/* Modal */}
         <Modal show={modalShow} onHide={handleCloseModal} centered>
           <Modal.Header closeButton>
             <Modal.Title>{modalTitle}</Modal.Title>

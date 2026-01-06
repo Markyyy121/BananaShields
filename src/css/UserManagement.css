@@ -1,88 +1,26 @@
-/* UserManagement.css - Updated responsive breakpoints */
-
-:root {
-  --brand-green: #0d4b2b;
-  --accent-yellow: #ffd700;
-  --bg-mint: #eaf7ea;
-}
-
-.um-title {
-  color: var(--brand-green);
-  font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 16px;
-}
-
+/* REMOVE width limits that break alignment */
 .um-stat-card {
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-  background: #fff;
-  max-width: 360px; /* keep the card from becoming too wide on large screens */
+  max-width: none;
   width: 100%;
-  display: block;
-}
-
-/* Metric-like adjustments when used as metric-card */
-.um-stat-card.metric-card {
-  min-height: 120px;
-  display: flex;
-  align-items: center;
-  padding: 18px 20px;
-}
-
-.um-stat-card.metric-card .metric-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--accent-yellow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #102a12;
-  font-size: 22px;
-  margin-right: 16px;
-}
-
-.um-stat-card.metric-card .metric-value {
-  margin: 0;
-  font-weight: 800;
-  font-size: 32px;
-  color: var(--brand-green);
-}
-
-@media (min-width: 1024px) {
-  .um-stat-card {
-    width: 320px; /* slightly narrower on 1024px+ */
-  }
 }
 
 /* Search */
-.um-search .form-control {
-  border-radius: 10px;
-  border: 1px solid #e6ece6;
-  background: #fff;
-}
+.um-search .form-control,
 .um-search .search-icon {
+  border-radius: 10px;
   background: #fff;
-  border: 1px solid #e6ece6;
-  color: #6c6c6c;
 }
 
-/* Table card */
+/* Table */
 .um-table-card {
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-}
-
-.um-table-wrap {
-  overflow-x: auto;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  background: #fff;
 }
 
 .um-table {
   min-width: 760px;
-  border-collapse: separate;
 }
 
 .um-table-head {
@@ -90,169 +28,21 @@
 }
 
 .um-table-head th {
-  text-transform: uppercase;
   font-size: 12px;
-  color: #6b7769;
   font-weight: 700;
   padding: 12px 16px;
-  border-bottom: none;
 }
 
-.um-table tbody tr {
-  background: #fff;
-  transition: background 120ms ease, transform 120ms ease;
-}
-.um-table tbody tr:hover {
-  background: #f6f9f6;
-}
-
-.user-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  color: #fff;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar.green { background: #0d4b2b; }
-.avatar.blue { background: #4a90e2; }
-.avatar.purple { background: #9b59b6; }
-.avatar.gold { background: #f4c542; color: #102a12; }
-
-.user-name { font-weight: 700; }
-.user-id { font-size: 12px; color: #8a8f86; }
-
-.role-badge.farmer { background-color: #ffd700; color: #102a12; }
-.role-badge.expert { background-color: #cfe9ff; color: #0f4e36; }
-.role-badge.admin { background-color: #f2e6ff; color: #5a2e6a; }
-
-.role-badge {
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
+/* Buttons */
 .btn-action {
-  border-radius: 8px;
   width: 40px;
   height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 120ms ease, background 120ms ease;
-}
-
-.btn-action:hover {
-  transform: scale(1.04);
-  background: #f8f8f8;
-}
-
-.um-table-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-}
-
-.results-text { color: #7a7f76; font-size: 13px; }
-
-.pagination-controls { display: flex; gap: 8px; }
-
-.page-btn {
   border-radius: 8px;
-  padding: 6px 10px;
-  min-width: 36px;
 }
 
-.page-btn.active {
-  background: var(--accent-yellow);
-  color: #102a12; font-weight: 700;
-}
-
-/* NEW RESPONSIVE BREAKPOINTS - 1020px and below */
-
-/* Large tablet / small desktop (1020px and below) */
-@media (max-width: 1023.98px) {
-  /* Cards stack and use full width */
-  .um-stat-card, 
-  .um-stat-card.metric-card, 
-  .metric-card {
-    width: 100% !important;
-    max-width: none;
-    min-height: 110px;
-  }
-
-  /* Search aligns with cards and stretches */
-  .um-search {
-    margin-top: 8px;
-  }
-
-  .um-search .form-control {
-    width: 100%;
-  }
-
-  /* Table: allow horizontal scroll and reduce min width */
-  .um-table {
-    min-width: 640px;
-  }
-
-  .um-table-head th { 
-    font-size: 11px; 
-    padding: 10px 12px; 
-  }
-}
-
-/* Tablet (768px and below) */
+/* Responsive */
 @media (max-width: 767.98px) {
-  .um-title { font-size: 24px; }
-
-  /* Mobile: cards and search occupy full width with comfortable gutters */
-  .um-stat-card, 
-  .um-stat-card.metric-card, 
-  .metric-card {
-    width: 100% !important;
-    padding: 12px 14px;
-    min-height: 96px;
+  .um-table {
+    min-width: 520px;
   }
-
-  .um-search { margin-top: 10px; }
-
-  /* Make the table as touch-scroll friendly */
-  .um-table-wrap { -webkit-overflow-scrolling: touch; }
-  .um-table { min-width: 520px; }
-
-  /* Adjust avatar and font sizes */
-  .avatar { width: 40px; height: 40px; font-size: 14px; }
-  .user-name { font-size: 14px; }
-  .user-id { font-size: 11px; }
-
-  /* Pagination buttons smaller and stack vertically */
-  .page-btn { padding: 6px 8px; min-width: 32px; }
-  .um-table-footer { 
-    flex-direction: column; 
-    gap: 8px; 
-    align-items: flex-start; 
-  }
-  .pagination-controls { margin-top: 6px; }
-}
-
-/* Small screens: very narrow devices */
-@media (max-width: 479.98px) {
-  .um-table { min-width: 480px; }
-  .um-title { font-size: 20px; }
-  .metric-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
-  }
-  .metric-value { font-size: 24px; }
 }

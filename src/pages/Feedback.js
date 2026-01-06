@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Card, Row, Col, Button, Modal, Form, Badge, Pagination } from "react-bootstrap";
+import { Card, Row, Col, Button, Modal, Form, Pagination } from "react-bootstrap";
 import { FaStar } from "react-icons/fa";
 import SideNav from "../components/sidenav";
 import "../css/AdminDashboard.css";
-import "../css/Feedback.module.css"; // CSS module (not using CSS modules import syntax to keep simple)
+import "../css/Feedback.module.css";
 
 const feedbacks = [
   {
@@ -89,32 +89,35 @@ const Feedback = () => {
   };
 
   const sendReply = () => {
-    // TODO: replace with API call to submit reply
     console.log(`Reply to ${selectedFeedback?.id}:`, replyText);
     closeReply();
   };
 
   return (
     <div className="d-flex admin-page" style={{ minHeight: "100vh", backgroundColor: "#D4E8D4" }}>
-      <SideNav />
+      <aside className="admin-sidenav">
+        <SideNav />
+      </aside>
 
-      <div className="admin-main">
+      <main className="admin-main">
         <div className="admin-main-container">
 
-          <h3 className="admin-title"><span className="admin-title-badge">Farmer Feedback Details</span></h3>
+          <h3 className="admin-title mb-3">
+            <span className="admin-title-badge">Farmer Feedback Details</span>
+          </h3>
 
-          {/* Cards list */}
+          {/* Feedback Cards */}
           <div>
             {feedbacks.map((f) => (
-              <Card key={f.id} className="mb-3" style={{ borderRadius: 12, padding: 16, boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
+              <Card key={f.id} className="mb-3 feedback-card" style={{ borderRadius: 12, padding: 16, boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
                 <Card.Body style={{ padding: 0 }}>
                   <Row className="align-items-start">
-                    <Col xs={2} sm={1} style={{ display: 'flex', alignItems: 'center' }}>
+                    <Col xs={3} sm={1} className="d-flex justify-content-center align-items-start mb-2 mb-sm-0">
                       <div
                         style={{
                           width: 60,
                           height: 60,
-                          borderRadius: 60,
+                          borderRadius: "50%",
                           background: f.avatarColor,
                           color: '#fff',
                           display: 'flex',
@@ -124,25 +127,27 @@ const Feedback = () => {
                           fontSize: 18,
                         }}
                         aria-hidden
-                        >{f.initials}</div>
+                      >
+                        {f.initials}
+                      </div>
                     </Col>
 
-                    <Col xs={10} sm={8}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Col xs={9} sm={11}>
+                      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start">
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 16, color: '#212529' }}>{f.name}</div>
                           <div style={{ color: '#6C757D', fontSize: 13 }}>{f.meta}</div>
                           <div style={{ color: '#6C757D', fontSize: 12, marginTop: 6 }}>{f.time}</div>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          {starRow(f.rating)}
-                        </div>
+                        <div className="mt-2 mt-md-0 text-md-end">{starRow(f.rating)}</div>
                       </div>
 
                       <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.6, color: '#212529' }}>{f.text}</div>
 
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
-                        <Button variant="primary" style={{ background: '#0D6EFD', border: 'none', padding: '8px 20px', borderRadius: 6 }} onClick={() => openReply(f)} aria-label={`Reply to ${f.name}`}>Reply</Button>
+                      <div className="d-flex justify-content-end mt-3">
+                        <Button variant="primary" style={{ background: '#0D6EFD', border: 'none', padding: '8px 20px', borderRadius: 6 }} onClick={() => openReply(f)}>
+                          Reply
+                        </Button>
                       </div>
                     </Col>
                   </Row>
@@ -160,7 +165,15 @@ const Feedback = () => {
               <div style={{ fontWeight: 700, marginBottom: 8 }}>{selectedFeedback?.name}</div>
               <Form.Group controlId="replyText">
                 <Form.Label className="visually-hidden">Reply</Form.Label>
-                <Form.Control as="textarea" ref={replyRef} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Write your reply..." aria-label="Reply message" className="reply-textarea" />
+                <Form.Control
+                  as="textarea"
+                  ref={replyRef}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Write your reply..."
+                  aria-label="Reply message"
+                  className="reply-textarea"
+                />
               </Form.Group>
             </Modal.Body>
             <Modal.Footer>
@@ -169,22 +182,20 @@ const Feedback = () => {
             </Modal.Footer>
           </Modal>
 
-          {/* Footer / Pagination */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
-            <div style={{ color: '#6C757D' }}>Showing 5 of 15 submissions</div>
-            <div>
-              <Pagination className="justify-content-end">
-                <Pagination.Prev />
-                <Pagination.Item active>{1}</Pagination.Item>
-                <Pagination.Item>{2}</Pagination.Item>
-                <Pagination.Item>{3}</Pagination.Item>
-                <Pagination.Next />
-              </Pagination>
-            </div>
+          {/* Pagination */}
+          <div className="d-flex flex-column flex-md-row align-items-center justify-content-between mt-3">
+            <div style={{ color: '#6C757D', marginBottom: 6 }}>Showing 5 of 15 submissions</div>
+            <Pagination className="justify-content-md-end">
+              <Pagination.Prev />
+              <Pagination.Item active>{1}</Pagination.Item>
+              <Pagination.Item>{2}</Pagination.Item>
+              <Pagination.Item>{3}</Pagination.Item>
+              <Pagination.Next />
+            </Pagination>
           </div>
 
         </div>
-      </div>
+      </main>
     </div>
   );
 };

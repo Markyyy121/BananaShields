@@ -1,7 +1,6 @@
-// src/pages/AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import SideNav from "../components/sidenav";
-import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
+import { Row, Col, Card, Spinner } from "react-bootstrap";
 import {
   BarChart,
   Bar,
@@ -33,26 +32,28 @@ const AdminDashboard = () => {
           const data = doc.data();
           return {
             id: doc.id,
-            createdAt: data.createdAt || null, // timestamp or number
+            createdAt: data.createdAt || null,
           };
         });
 
         setUsers(usersData);
 
-        // Prepare monthly registration data
-        const monthCounts = Array(12).fill(0); // Jan = 0 ... Dec = 11
+        const monthCounts = Array(12).fill(0);
         usersData.forEach((u) => {
           if (u.createdAt) {
             const date = new Date(u.createdAt);
-            const month = date.getMonth();
-            monthCounts[month]++;
+            monthCounts[date.getMonth()]++;
           }
         });
 
-        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        const chartData = months.map((m, idx) => ({ month: m, count: monthCounts[idx] }));
-        setMonthlyRegistrations(chartData);
+        const months = [
+          "Jan","Feb","Mar","Apr","May","Jun",
+          "Jul","Aug","Sep","Oct","Nov","Dec"
+        ];
 
+        setMonthlyRegistrations(
+          months.map((m, i) => ({ month: m, count: monthCounts[i] }))
+        );
       } catch (err) {
         console.error("Error fetching users:", err);
       } finally {
@@ -65,69 +66,77 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-page">
-      <SideNav />
+      {/* Sidebar */}
+      <aside className="admin-sidenav">
+        <SideNav />
+      </aside>
 
-      <div className="admin-main">
+      {/* Main Content */}
+      <main className="admin-main">
         <div className="admin-main-container">
+          {/* Title */}
           <h3 className="admin-title">
             <span className="admin-title-badge">Admin Dashboard</span>
           </h3>
 
-          <Container fluid className="px-0">
-            {/* Metric card */}
-            <Row className="mb-4">
-              <Col xs={12} md={6} lg={4}>
-                <Card className="metric-card">
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", width: "100%" }}>
-                    <div className="metric-icon">👤</div>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", height: "100%" }}>
-                      <h4 className="metric-value">{loading ? <Spinner animation="border" size="sm" /> : users.length}</h4>
-                      <small>Total Users</small>
-                    </div>
+          {/* Metrics */}
+          <Row className="mb-4">
+            <Col xs={12} md={6} lg={4}>
+              <Card className="metric-card">
+                <div className="d-flex align-items-center">
+                  <div className="metric-icon">👤</div>
+                  <div>
+                    <h4 className="metric-value mb-0">
+                      {loading ? <Spinner size="sm" /> : users.length}
+                    </h4>
+                    <small>Total Users</small>
                   </div>
-                </Card>
-              </Col>
-            </Row>
+                </div>
+              </Card>
+            </Col>
+          </Row>
 
-            {/* Analytics section with chart */}
-            <Row>
-              <Col xs={12}>
-                <Card className="analytics-card">
-                  <div className="analytics-header">
-                    <div>
-                      <h5 className="mb-0">System Analytics</h5>
-                      <small className="text-muted">Monthly user registrations.</small>
-                    </div>
-                  </div>
+          {/* Analytics */}
+          <Row>
+            <Col xs={12}>
+              <Card className="analytics-card">
+                <h5 className="mb-1">System Analytics</h5>
+                <small className="text-muted">
+                  Monthly user registrations
+                </small>
 
-                  <div className="chart-grid single-chart">
-                    <div className="chart-panel" style={{ gridColumn: "1 / -1" }}>
-                      <div className="panel-title">Monthly Registrations</div>
-                      <div className="chart-wrapper">
-                        {loading ? (
-                          <div className="text-center p-4">
-                            <Spinner animation="border" variant="success" />
-                          </div>
-                        ) : (
-                          <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={monthlyRegistrations}>
-                              <CartesianGrid stroke="#eaeaea" strokeDasharray="3 3" />
-                              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                              <YAxis tick={{ fontSize: 12 }} />
-                              <Tooltip />
-                              <Bar dataKey="count" fill="#0d4b2b" radius={[6, 6, 0, 0]} />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        )}
-                      </div>
+                <div className="chart-grid mt-3">
+                  <div className="chart-panel">
+                    <div className="panel-title">
+                      Monthly Registrations
+                    </div>
+
+                    <div className="chart-wrapper">
+                      {loading ? (
+                        <Spinner />
+                      ) : (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={monthlyRegistrations}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar
+                              dataKey="count"
+                              fill="#0d4b2b"
+                              radius={[6, 6, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </div>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
+                </div>
+              </Card>
+            </Col>
+          </Row>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
