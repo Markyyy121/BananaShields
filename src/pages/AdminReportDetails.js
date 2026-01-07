@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Card, Row, Col, Badge, Spinner } from "react-bootstrap";
 import {
   FaArrowLeft,
-  FaMapMarkerAlt,
   FaCalendarAlt,
   FaPercent,
   FaLeaf,
@@ -41,19 +40,35 @@ const AdminReportDetails = () => {
 
         if (snap.exists()) {
           const data = snap.data();
+
+
+          console.log("FULL FIRESTORE DOCUMENT:", data);
+
+          console.log("preventiveMeasures:", data.preventiveMeasures);
+
+          if (Array.isArray(data.preventiveMeasures)) {
+            data.preventiveMeasures.forEach((pm, index) => {
+              console.log(`Preventive Measure [${index}]`, pm);
+              console.log(`Category [${index}]:`, pm.category);
+              console.log(`Steps [${index}]:`, pm.steps);
+            });
+          }
           const createdAt = data.createdAt?.toDate();
 
           setReport({
             id: snap.id,
             disease: data.diseaseName || "N/A",
+            scientificName: data.scientificName || "N/A",
             crop: data.diseaseType || "N/A",
             confidence: data.confidenceLevel ?? 0,
-            location: data.location || "N/A",
             scanDate: createdAt ? createdAt.toLocaleDateString() : "N/A",
             scanTime: createdAt ? createdAt.toLocaleTimeString() : "N/A",
             imageUrl: data.imageUrl || "",
             symptoms: data.symptoms || [],
-            treatmentSteps: (data.treatmentSteps || []).map(step => step.description),
+            treatmentSteps: (data.treatmentSteps || []).map(
+              (step) => step.description
+            ),
+            preventiveMeasures: data.preventiveMeasures || [],
             submittedBy: {
               name: data.userName || "Unknown",
               email: data.userEmail || "N/A",
@@ -75,12 +90,10 @@ const AdminReportDetails = () => {
 
   return (
     <div className="admin-page">
-      {/* Sidebar */}
       <aside className="admin-sidenav">
         <SideNav />
       </aside>
 
-      {/* Main content */}
       <main className="admin-main">
         {loading ? (
           <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
@@ -88,8 +101,6 @@ const AdminReportDetails = () => {
           </div>
         ) : (
           <div className="admin-main-container">
-
-            {/* Header */}
             <Card className="border-0 mb-4" style={{ backgroundColor: "#E8F5E9", borderRadius: 12 }}>
               <Card.Body style={{ padding: 0 }}>
                 <h3 className="admin-title">
@@ -118,26 +129,34 @@ const AdminReportDetails = () => {
             </Card>
 
             <Row className="g-4">
-              {/* LEFT */}
               <Col xs={12} lg={8}>
-                {/* Disease Detection Summary */}
                 <Card className="mb-4">
                   <Card.Body style={{ padding: 32 }}>
-                    <h3 style={{ fontSize: 20, fontWeight: 700, color: "#1F2937", marginBottom: 16 }}>Disease Detection Summary</h3>
+                    <h3>Disease Detection Summary</h3>
 
                     <Row className="g-3 text-start">
-                      <Col xs={12} md={6}>
-                        <div className="d-flex gap-3 p-3 bg-danger-subtle rounded align-items-center">
+                      <Col md={6}>
+                        <div className="d-flex gap-3 p-3 bg-danger-subtle rounded">
                           <FaExclamationTriangle />
                           <div>
                             <div className="text-muted small">Disease Name</div>
-                            <div>🔴 {report.disease}</div>
+                            <div>{report.disease}</div>
                           </div>
                         </div>
                       </Col>
 
-                      <Col xs={12} md={6}>
-                        <div className="d-flex gap-3 p-3 bg-primary-subtle rounded align-items-center">
+                      <Col md={6}>
+                        <div className="d-flex gap-3 p-3 bg-secondary-subtle rounded">
+                          <FaLeaf />
+                          <div>
+                            <div className="text-muted small">Scientific Name</div>
+                            <div>{report.scientificName}</div>
+                          </div>
+                        </div>
+                      </Col>
+
+                      <Col md={6}>
+                        <div className="d-flex gap-3 p-3 bg-primary-subtle rounded">
                           <FaPercent />
                           <div>
                             <div className="text-muted small">Confidence Level</div>
@@ -146,8 +165,8 @@ const AdminReportDetails = () => {
                         </div>
                       </Col>
 
-                      <Col xs={12} md={6}>
-                        <div className="d-flex gap-3 p-3 bg-success-subtle rounded align-items-center">
+                      <Col md={6}>
+                        <div className="d-flex gap-3 p-3 bg-success-subtle rounded">
                           <FaLeaf />
                           <div>
                             <div className="text-muted small">Disease Type</div>
@@ -156,18 +175,8 @@ const AdminReportDetails = () => {
                         </div>
                       </Col>
 
-                      <Col xs={12} md={6}>
-                        <div className="d-flex gap-3 p-3 bg-danger-subtle rounded align-items-center">
-                          <FaMapMarkerAlt />
-                          <div>
-                            <div className="text-muted small">Location</div>
-                            <div>{report.location}</div>
-                          </div>
-                        </div>
-                      </Col>
-
-                      <Col xs={12} md={6}>
-                        <div className="d-flex gap-3 p-3 bg-light rounded align-items-center">
+                      <Col md={6}>
+                        <div className="d-flex gap-3 p-3 bg-light rounded">
                           <FaCalendarAlt />
                           <div>
                             <div className="text-muted small">Scan Date & Time</div>
@@ -178,38 +187,91 @@ const AdminReportDetails = () => {
                       </Col>
                     </Row>
 
-                    {/* Symptoms */}
-                    <div className="text-start mt-4">
+                    <div className="mt-4 text-start">
                       <h4>Observed Symptoms</h4>
                       <ul>
-                        {report.symptoms.map((s, i) => <li key={i}>{s}</li>)}
+                        {report.symptoms.map((s, i) => (
+                          <li key={i}>{s}</li>
+                        ))}
                       </ul>
                     </div>
                   </Card.Body>
                 </Card>
 
-                {/* Visual Inspection */}
                 <Card className="mb-4">
                   <Card.Body style={{ padding: 32 }}>
                     <h3>Visual Inspection</h3>
-                    <div className="d-flex justify-content-center align-items-center" style={{ background: "#F3F4F6", borderRadius: 12, minHeight: 300 }}>
+                    <div 
+                      className="d-flex justify-content-center align-items-center" 
+                      style={{ 
+                        maxHeight: 400,   // adjust max height as needed
+                        overflow: "hidden", 
+                        textAlign: "center" 
+                      }}
+                    >
                       {report.imageUrl ? (
-                        <img src={report.imageUrl} alt="Scan" style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 12 }} />
-                      ) : <GiBanana size={60} />}
+                        <img 
+                          src={report.imageUrl} 
+                          alt="Scan" 
+                          style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 12 }} 
+                        />
+                      ) : (
+                        <GiBanana size={60} />
+                      )}
                     </div>
                   </Card.Body>
                 </Card>
 
-                {/* Treatment */}
                 <Card className="mb-4">
-                  <Card.Body style={{ padding: 24 }}>
-                    <h4>Treatment Recommendation</h4>
-                    {report.treatmentSteps.map((step, i) => <p key={i}>{step}</p>)}
+                  <Card.Body>
+                    <h4 className="mb-3">Treatment Recommendation</h4>
+
+                    <Row className="g-3">
+                      {report.treatmentSteps.map((step, i) => (
+                        <Col xs={12} key={i}>
+                          <Card className="border-0 shadow-sm text-start">
+                            <Card.Body>
+                              <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                                Step {i + 1}
+                              </div>
+                              <div style={{ color: "#374151", lineHeight: 1.6 }}>
+                                {step}
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Card.Body>
+                </Card>
+
+
+                {/* PREVENTIVE MEASURES */}
+                <Card className="mb-4">
+                  <Card.Body>
+                    <h4 className="mb-3">Preventive Measures</h4>
+                    <Row className="g-3">
+                      {report.preventiveMeasures.map((pm, i) => (
+                        <Col xs={12} md={6} key={i}>
+                          <Card className="h-100 border-0 shadow-sm">
+                            <Card.Body>
+                              <Badge bg="success" className="mb-2">
+                                {pm.category}
+                              </Badge>
+                              <ul className="mt-2 mb-0 text-start">
+                                {pm.steps.map((step, idx) => (
+                                  <li key={idx}>{step}</li>
+                                ))}
+                              </ul>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
                   </Card.Body>
                 </Card>
               </Col>
 
-              {/* RIGHT */}
               <Col xs={12} lg={4}>
                 <Card style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
                   <Card.Body style={{ padding: 24, textAlign: "center" }}>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Card, Table, Button, Spinner } from "react-bootstrap";
-import { FaArrowLeft, FaMapMarkerAlt } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import SideNav from "../components/sidenav";
 import "../css/AdminDashboard.css";
@@ -39,7 +39,6 @@ const AdminUserDetails = () => {
             id: doc.id,
             disease: data.diseaseName || "N/A",
             crop: data.diseaseType || "N/A",
-            location: data.location || "N/A",
             confidence: data.confidenceLevel ?? 0,
             scanDate: data.createdAt
               ? data.createdAt.toDate().toLocaleDateString()
@@ -58,7 +57,6 @@ const AdminUserDetails = () => {
     fetchScans();
   }, [userId]);
 
-  // Pagination logic
   const totalPages = Math.ceil(reports.length / SCANS_PER_PAGE);
   const paginatedReports = useMemo(() => {
     const startIndex = (currentPage - 1) * SCANS_PER_PAGE;
@@ -86,33 +84,28 @@ const AdminUserDetails = () => {
 
   return (
     <div className="admin-page">
-      {/* Sidebar */}
       <aside className="admin-sidenav">
         <SideNav />
       </aside>
 
-      {/* Main content */}
       <main className="admin-main">
         <div className="admin-main-container">
-          {/* Header */}
           <div className="mb-4">
             <h3 className="admin-title mb-2">
               <span className="admin-title-badge">User Details</span>
             </h3>
 
-            {/* Left-aligned back button */}
             <div className="text-start">
               <Button
                 variant="link"
                 onClick={() => navigate("/users")}
-                className="p-0 back-btn text-decoration-none"
+                className="p-0 back-btn text-decoration-none text-secondary"
               >
-                <FaArrowLeft className="me-2" /> Back to User Management
+                <FaArrowLeft className="me-2" /> Back
               </Button>
             </div>
           </div>
 
-          {/* Scanned Reports */}
           <Card className="um-table-card shadow-sm border-0">
             <Card.Body>
               <h4 className="mb-1 text-start">Scanned Reports</h4>
@@ -130,12 +123,14 @@ const AdminUserDetails = () => {
                 <>
                   <div className="table-responsive">
                     <Table hover className="align-middle text-center">
-                      <thead className="um-table-head">
+                      <thead
+                        className="um-table-head text-center"
+                        style={{ textTransform: "uppercase", fontSize: "13px" }}
+                      >
                         <tr>
                           {[
                             "Disease Name",
                             "Disease Type",
-                            "Location",
                             "Confidence",
                             "Scan Date",
                             "Actions",
@@ -161,7 +156,7 @@ const AdminUserDetails = () => {
 
                             return (
                               <tr key={row.id}>
-                                <td className="text-start">
+                                <td className="text-center">
                                   <span
                                     style={{
                                       width: "8px",
@@ -175,13 +170,6 @@ const AdminUserDetails = () => {
                                   {row.disease}
                                 </td>
                                 <td>{row.crop}</td>
-                                <td className="text-start">
-                                  <FaMapMarkerAlt
-                                    className="me-1"
-                                    style={{ color: "#EF4444", marginRight: "4px" }}
-                                  />
-                                  {row.location}
-                                </td>
                                 <td style={{ fontWeight: 700, color: confidenceColor }}>
                                   {row.confidence}%
                                 </td>
@@ -204,7 +192,7 @@ const AdminUserDetails = () => {
                           })
                         ) : (
                           <tr>
-                            <td colSpan={6} className="text-center text-muted py-4">
+                            <td colSpan={5} className="text-center text-muted py-4">
                               No scan records found.
                             </td>
                           </tr>
@@ -213,7 +201,6 @@ const AdminUserDetails = () => {
                     </Table>
                   </div>
 
-                  {/* Pagination */}
                   {totalPages > 1 && (
                     <div className="d-flex flex-wrap justify-content-end align-items-center mt-3">
                       <Button
