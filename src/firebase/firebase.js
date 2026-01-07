@@ -3,20 +3,20 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Firebase configuration
+// 🔐 Firebase config from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyAUeGe0xK1nycesGkfweaw5nSkxJ1Ci-oI",
-  authDomain: "bananashield-59b37.firebaseapp.com",
-  projectId: "bananashield-59b37",
-  storageBucket: "bananashield-59b37.firebasestorage.app",
-  messagingSenderId: "253454228482",
-  appId: "1:253454228482:web:987a7274504f7598751b1b",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
-// ✅ Initialize Firebase FIRST
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// ✅ Then initialize services
+// ✅ Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 

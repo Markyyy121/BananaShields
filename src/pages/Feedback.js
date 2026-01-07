@@ -145,7 +145,10 @@ const Feedback = () => {
             <Card key={f.id} className="mb-3 feedback-card">
               <Card.Body>
                 <Row>
-                  <Col xs={1}>
+                  <Col
+                    xs={12} sm={2} md={1}
+                    className="mb-2 mb-md-0 d-flex justify-content-start justify-content-md-start"
+                  >
                     <div
                       style={{
                         width: 60,
