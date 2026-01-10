@@ -27,6 +27,7 @@ const Feedback = () => {
 
   const replyRef = useRef(null);
 
+  // FETCH FEEDBACKS
   useEffect(() => {
     const fetchFeedbacks = async () => {
       const q = query(
@@ -41,6 +42,7 @@ const Feedback = () => {
           id: docSnap.id,
           name: d.userName,
           email: d.userEmail,
+          subject: d.subject || "", // added subject
           text: d.message,
           admin_reply: d.admin_reply || "",
           initials: d.userName
@@ -121,7 +123,7 @@ const Feedback = () => {
     }
   };
 
-  // 🔢 PAGINATION LOGIC
+  // PAGINATION LOGIC
   const totalPages = Math.ceil(feedbacks.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedFeedbacks = feedbacks.slice(
@@ -171,9 +173,36 @@ const Feedback = () => {
                     <div style={{ fontSize: 13 }}>{f.email}</div>
                     <div style={{ fontSize: 12 }}>{f.time}</div>
 
-                    <div className="text-center" style={{ marginTop: 10 }}>
-                      {f.text}
-                    </div>
+                    {/* SUBJECT */}
+                    {f.subject && (
+                      <div
+                        style={{
+                          marginTop: 10,
+                          marginBottom: 5,
+                          padding: "8px 10px",
+                          backgroundColor: "#E2F0D9", // light green background
+                          borderRadius: 5,
+                          fontWeight: 700,
+                        }}
+                      >
+                        Subject: {f.subject}
+                      </div>
+                    )}
+
+                    {/* MESSAGE */}
+                    {f.text && (
+                      <div
+                        style={{
+                          marginTop: 5,
+                          padding: "8px 10px",
+                          backgroundColor: "#F0F0F0", // light gray background
+                          borderRadius: 5,
+                        }}
+                      >
+                        <span style={{ fontWeight: 700 }}>Message: </span>
+                        <span>{f.text}</span>
+                      </div>
+                    )}
 
                     <div className="d-flex justify-content-end mt-3">
                       <Button onClick={() => openReply(f)}>Reply</Button>

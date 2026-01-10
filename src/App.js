@@ -19,7 +19,7 @@ function App() {
   const handleLogin = () => {
     setShowDashboard(true);
   };
-
+console.log(process.env.REACT_APP_FIREBASE_PROJECT_ID);
   return (
     <div className="App">
       {showDashboard ? (

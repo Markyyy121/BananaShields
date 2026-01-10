@@ -89,7 +89,7 @@ const UserManagement = () => {
     return filteredUsers.slice(startIndex, startIndex + USERS_PER_PAGE);
   }, [filteredUsers, currentPage]);
 
-  // Generate pagination buttons (max 3 visible + ellipsis)
+  // Page buttons (max 3 visible + ellipsis)
   const getPageButtons = () => {
     const pages = [];
     const maxVisible = 3;
@@ -117,11 +117,13 @@ const UserManagement = () => {
 
       <main className="admin-main">
         <div className="admin-main-container">
-          <h3 className="admin-title">
+
+          {/* HEADER */}
+          <h3 className="admin-title mb-3">
             <span className="admin-title-badge">User Management</span>
           </h3>
 
-          {/* Metric */}
+          {/* METRIC */}
           <Row className="mb-3">
             <Col xs={12} md={6} lg={4}>
               <Card className="metric-card">
@@ -138,7 +140,7 @@ const UserManagement = () => {
             </Col>
           </Row>
 
-          {/* Search */}
+          {/* SEARCH */}
           <Row className="mb-3">
             <Col xs={12} md={6} lg={4}>
               <InputGroup className="um-search">
@@ -157,98 +159,101 @@ const UserManagement = () => {
             </Col>
           </Row>
 
-          {/* Table */}
+          {/* TABLE */}
           <Row>
             <Col xs={12}>
               <Card className="um-table-card">
-                <div className="table-responsive um-table-wrap">
+                <div className="table-responsive">
                   {loading ? (
-                    <div className="text-center p-4">
+                    <div className="text-center py-5">
                       <Spinner animation="border" />
                     </div>
                   ) : (
-                    <>
-                      <Table hover borderless className="um-table text-center">
-                        <thead className="um-table-head">
-                          <tr>
-                            <th>FULL NAME</th>
-                            <th>EMAIL</th>
-                            <th>PHONE</th>
-                            <th>FARM SIZE</th>
-                            <th>JOINED</th>
-                            <th>ACTIONS</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {paginatedUsers.length ? (
-                            paginatedUsers.map((user) => (
-                              <tr key={user.id}>
-                                <td>{user.fullName}</td>
-                                <td>{user.email}</td>
-                                <td>{user.phone}</td>
-                                <td>{user.farmSize}</td>
-                                <td>{user.createdAt}</td>
-                                <td>
-                                  <Button
-                                    variant="light"
-                                    className="btn-action"
-                                    onClick={() => navigate(`/users/${user.id}`)}
-                                  >
-                                    <Eye />
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan={6} className="text-muted">
-                                No users found.
+                    <Table hover borderless className="um-table text-center">
+                      <thead className="um-table-head">
+                        <tr>
+                          <th>FULL NAME</th>
+                          <th>EMAIL</th>
+                          <th>PHONE</th>
+                          <th>FARM SIZE</th>
+                          <th>JOINED</th>
+                          <th>ACTIONS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedUsers.length > 0 ? (
+                          paginatedUsers.map((user) => (
+                            <tr key={user.id}>
+                              <td>{user.fullName}</td>
+                              <td>{user.email}</td>
+                              <td>{user.phone}</td>
+                              <td>{user.farmSize}</td>
+                              <td>{user.createdAt}</td>
+                              <td>
+                                <Button
+                                  variant="light"
+                                  className="btn-action"
+                                  onClick={() => navigate(`/users/${user.id}`)}
+                                >
+                                  <Eye />
+                                </Button>
                               </td>
                             </tr>
-                          )}
-                        </tbody>
-                      </Table>
-
-                      {/* ✅ Right-aligned Pagination */}
-                      {totalPages > 1 && (
-                        <div className="d-flex justify-content-end align-items-center mt-3">
-                          <Button
-                            variant="light"
-                            disabled={currentPage === 1}
-                            onClick={() => setCurrentPage((p) => p - 1)}
-                          >
-                            &lt;
-                          </Button>
-
-                          {getPageButtons().map((p, idx) =>
-                            p === "…" ? (
-                              <span key={idx} className="mx-1">
-                                …
-                              </span>
-                            ) : (
-                              <Button
-                                key={idx}
-                                variant={currentPage === p ? "primary" : "light"}
-                                onClick={() => setCurrentPage(p)}
-                                className="mx-1"
-                              >
-                                {p}
-                              </Button>
-                            )
-                          )}
-
-                          <Button
-                            variant="light"
-                            disabled={currentPage === totalPages}
-                            onClick={() => setCurrentPage((p) => p + 1)}
-                          >
-                            &gt;
-                          </Button>
-                        </div>
-                      )}
-                    </>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={6} className="text-center py-4 text-muted">
+                              No users found
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </Table>
                   )}
                 </div>
+
+                {/* PAGINATION */}
+                {totalPages > 1 && (
+                  <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                    <div className="mb-2 mb-md-0">
+                      Showing {paginatedUsers.length} of {filteredUsers.length} users
+                    </div>
+                    <div className="pagination-controls">
+                      <Button
+                        variant="light"
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage((p) => p - 1)}
+                        className="me-1"
+                      >
+                        &lt;
+                      </Button>
+
+                      {getPageButtons().map((p, idx) =>
+                        p === "…" ? (
+                          <span key={idx} className="mx-1">…</span>
+                        ) : (
+                          <Button
+                            key={idx}
+                            variant={currentPage === p ? "primary" : "light"}
+                            onClick={() => setCurrentPage(p)}
+                            className="mx-1"
+                          >
+                            {p}
+                          </Button>
+                        )
+                      )}
+
+                      <Button
+                        variant="light"
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage((p) => p + 1)}
+                        className="ms-1"
+                      >
+                        &gt;
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </Card>
             </Col>
           </Row>

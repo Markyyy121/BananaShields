@@ -19,6 +19,33 @@
   background: #fff;
 }
 
+/* Wrap table in scrollable container */
+.um-table-wrap {
+  overflow-x: auto;
+  position: relative;
+}
+
+/* Fixed pagination at bottom of card */
+.table-card-with-pagination {
+  position: relative;
+  padding-bottom: 60px; 
+}
+
+.pagination-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 15px;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
 .um-table {
   min-width: 760px;
 }

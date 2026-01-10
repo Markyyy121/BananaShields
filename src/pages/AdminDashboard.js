@@ -17,6 +17,7 @@ import "../css/AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [monthlyRegistrations, setMonthlyRegistrations] = useState([]);
 
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
       setLoading(true);
       try {
         const usersRef = collection(db, "users");
+        
         const q = query(usersRef, orderBy("createdAt", "asc"));
         const snapshot = await getDocs(q);
 
@@ -54,6 +56,14 @@ const AdminDashboard = () => {
         setMonthlyRegistrations(
           months.map((m, i) => ({ month: m, count: monthCounts[i] }))
         );
+
+        const reportsRef = collection(db, "scan_history");
+        const reportsSnapshot = await getDocs(reportsRef);
+
+        const reportsData = reportsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+        }));
+        setReports(reportsData);
       } catch (err) {
         console.error("Error fetching users:", err);
       } finally {
@@ -81,7 +91,7 @@ const AdminDashboard = () => {
 
           {/* Metrics */}
           <Row className="mb-4">
-            <Col xs={12} md={6} lg={4}>
+            <Col xs={12} md={6} lg={4} className="mb-3">
               <Card className="metric-card">
                 <div className="d-flex align-items-center">
                   <div className="metric-icon">👤</div>
@@ -90,6 +100,20 @@ const AdminDashboard = () => {
                       {loading ? <Spinner size="sm" /> : users.length}
                     </h4>
                     <small>Total Users</small>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={12} md={6} lg={4}>
+              <Card className="metric-card">
+                <div className="d-flex align-items-center">
+                  <div className="metric-icon">📄</div>
+                  <div>
+                    <h4 className="metric-value mb-0">
+                      {loading ? <Spinner size="sm" /> : reports.length}
+                    </h4>
+                    <small>Total Reports</small>
                   </div>
                 </div>
               </Card>
